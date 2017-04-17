@@ -102,6 +102,9 @@ public class TravelTimeGraphCommandWindow extends JFrame implements IGraphComman
         });
     }
 
+    private void createUIComponents() {
+        rootPanel = new JPanel();
+    }
 
     @Override
     public void windowEnable() {

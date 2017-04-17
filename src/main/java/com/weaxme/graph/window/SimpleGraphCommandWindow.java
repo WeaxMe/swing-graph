@@ -24,13 +24,10 @@ public class SimpleGraphCommandWindow extends JFrame implements IGraphCommandWin
     private JFormattedTextField graphFunctionField;
     private JFormattedTextField stepField;
 
-    @Inject
-    private IGraphApplication app;
-
-
     private static final Logger LOG = LoggerFactory.getLogger(SimpleGraphCommandWindow.class);
 
-    public SimpleGraphCommandWindow() {
+    @Inject
+    private SimpleGraphCommandWindow(final IGraphApplication app) {
         super("Simple graph command window");
         buildGraphButton.addActionListener(new ActionListener() {
             @Override
