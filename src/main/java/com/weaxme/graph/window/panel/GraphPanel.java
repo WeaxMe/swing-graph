@@ -94,6 +94,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
     private void buildVector(Graphics2D g2d) {
         synchronized (lock) {
             g2d.setPaint(Color.RED);
+            g2d.setStroke(new BasicStroke(app.getGraphLineWidth()));
             Iterator<PixelCoordinate> iterator1 = points1.iterator();
             Iterator<PixelCoordinate> iterator2 = points2.iterator();
             while (iterator1.hasNext() && iterator2.hasNext()) {

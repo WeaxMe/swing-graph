@@ -15,8 +15,8 @@ public class PixelCoordinate implements Serializable {
     public PixelCoordinate(Coordinate point, IGraphApplication app) {
         Double x = point.getX();
         Double y = point.getY();
-        int xLength = Math.abs((int) (x * app.getPixelStep()));
-        int yLength = Math.abs((int) (y * app.getPixelStep()));
+        int xLength = Math.abs((int) (x * app.getPixelStep() * app.getPointMultiplier()));
+        int yLength = Math.abs((int) (y * app.getPixelStep() * app.getPointMultiplier()));
         if (x < 0) {
             xLength = app.getX0() - Math.abs(xLength);
         } else xLength += app.getX0();

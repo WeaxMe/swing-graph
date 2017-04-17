@@ -4,9 +4,12 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.weaxme.graph.service.GraphInitModule;
 import com.weaxme.graph.service.IGraphApplication;
+import com.weaxme.graph.service.IGraphCommandWindow;
 import com.weaxme.graph.service.IGraphPanel;
 import com.weaxme.graph.service.impl.DefaultGodographAxisGraph;
+import com.weaxme.graph.window.GraphWindow;
 import com.weaxme.graph.window.SimpleGraphCommandWindow;
+import com.weaxme.graph.window.TravelTimeGraphCommandWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,24 +24,22 @@ public class Main {
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        LOG.info("Start running wing schedule program");
+        LOG.info("Start running Swing Graph program");
         final Injector injector = Guice.createInjector(new GraphInitModule());
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                JFrame frame = new JFrame("Graph");
                 Dimension dimension = new Dimension(1280, 800);
-                frame.setSize(dimension);
                 IGraphPanel graphPanel = injector.getInstance(IGraphPanel.class);
-                frame.add((Component) graphPanel);
-                frame.setLocationRelativeTo(null);
-                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                frame.setVisible(true);
+
                 injector.getInstance(IGraphApplication.class)
                         .setGraphPanel(graphPanel)
                         .setGraph(new DefaultGodographAxisGraph("6 13 9 2", -10, 10, 0.01))
                         .repaintGraph();
-                injector.getInstance(SimpleGraphCommandWindow.class).setVisible(true);
+                IGraphCommandWindow travel = injector.getInstance(TravelTimeGraphCommandWindow.class);
+                IGraphCommandWindow simple = injector.getInstance(SimpleGraphCommandWindow.class);
+                JFrame frame = new GraphWindow(graphPanel, dimension, simple, travel);
+                frame.setVisible(true);
             }
         });
     }

@@ -13,8 +13,10 @@ import java.util.List;
 public interface IGraphApplication extends Serializable {
     public IGraphApplication updateGraph(PixelCoordinate point1, PixelCoordinate point2);
     public IGraphApplication repaintGraph();
+    public IGraphApplication repaintGraphWithoutDelay();
     public IGraphApplication setGraph(IGraph graph);
-    public IGraphApplication updateGraphDelay(long delay);
+    public IGraph getGraph();
+    public IGraphApplication setGraphDelay(long delay);
     public IGraphApplication setPixelStep(int pixelStep);
     public IGraphApplication setBorderPixelLimit(int limit);
     public IGraphApplication setMarkLength(int markLength);
@@ -36,5 +38,9 @@ public interface IGraphApplication extends Serializable {
     public IGraphApplication setNowRepaint(boolean repaint);
     public IGraphApplication setNowGraphBuild(boolean build);
     public boolean isNowGraphBuild();
-
+    public IGraphApplication setGraphLineWidth(int width);
+    public int getGraphLineWidth();
+    public List<Integer> getPossibleWidth();
+    public double getPointMultiplier();
+    public IGraphApplication setPointMultiplier(double multiplier);
 }

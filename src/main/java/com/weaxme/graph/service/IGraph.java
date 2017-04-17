@@ -11,4 +11,7 @@ public interface IGraph extends Serializable {
     String getGraphFunction();
     IGraph refresh();
     List<Coordinate> getPoints();
+    double getMin();
+    double getMax();
+    double getStep();
 }

@@ -3,6 +3,7 @@ package com.weaxme.graph.window;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.weaxme.graph.service.IGraphApplication;
+import com.weaxme.graph.service.IGraphCommandWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ import java.awt.event.ActionListener;
  * @author Vitaliy Gonchar
  */
 @Singleton
-public class SimpleGraphCommandWindow extends JFrame {
+public class SimpleGraphCommandWindow extends JFrame implements IGraphCommandWindow {
     private JPanel rootPanel;
     private JButton buildGraphButton;
     private JComboBox delayBox;
@@ -48,4 +49,20 @@ public class SimpleGraphCommandWindow extends JFrame {
         rootPanel = new JPanel();
     }
 
+    @Override
+    public void windowEnable() {
+        setVisible(true);
+        setEnabled(true);
+    }
+
+    @Override
+    public void windowDisable() {
+        setVisible(false);
+        setEnabled(false);
+    }
+
+    @Override
+    public boolean isWindowEnable() {
+        return isVisible() && isEnabled();
+    }
 }

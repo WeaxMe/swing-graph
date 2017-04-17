@@ -26,6 +26,9 @@ public class GraphApplication implements IGraphApplication {
     private int maxScheduleHeight;
     private int maxScheduleWidth;
 
+    private int graphLineWidth = 1;
+    private double pointMultiplier = 1;
+
     private boolean nowRepaint = false;
     private boolean build      = false;
 
@@ -46,6 +49,15 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
+    public IGraphApplication repaintGraphWithoutDelay() {
+        if (!nowRepaint) {
+            graphPanel.clearAndRepaint();
+            new Thread(new GraphUpdater(this, 0)).start();
+        }
+        return this;
+    }
+
+    @Override
     public IGraphApplication setGraph(IGraph graph) {
         if (graph == null)
             throw new IllegalArgumentException("graph cannot be null!");
@@ -54,7 +66,12 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
-    public IGraphApplication updateGraphDelay(long delay) {
+    public IGraph getGraph() {
+        return graph;
+    }
+
+    @Override
+    public IGraphApplication setGraphDelay(long delay) {
         if (delay < 0) throw new IllegalArgumentException("delay cannot be < 0");
         this.delay = delay;
         return this;
@@ -180,5 +197,40 @@ public class GraphApplication implements IGraphApplication {
     @Override
     public boolean isNowGraphBuild() {
         return build;
+    }
+
+    @Override
+    public IGraphApplication setGraphLineWidth(int width) {
+        if (width <= 0)
+            throw new IllegalStateException("Line width cannot be  <= 0");
+        this.graphLineWidth = width;
+        return this;
+    }
+
+    @Override
+    public int getGraphLineWidth() {
+        return graphLineWidth;
+    }
+
+    @Override
+    public List<Integer> getPossibleWidth() {
+        List<Integer> widths = Lists.newArrayList();
+        for (int i = 1; i <= 10; i++) {
+            widths.add(i);
+        }
+        return widths;
+    }
+
+    @Override
+    public double getPointMultiplier() {
+        return pointMultiplier;
+    }
+
+    @Override
+    public IGraphApplication setPointMultiplier(double multiplier) {
+        if (multiplier <= 0)
+            throw new IllegalArgumentException("Point multiplier cannot be <= 0");
+        this.pointMultiplier = multiplier;
+        return this;
     }
 }
