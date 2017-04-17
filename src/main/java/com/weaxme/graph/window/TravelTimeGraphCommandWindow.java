@@ -30,9 +30,8 @@ public class TravelTimeGraphCommandWindow extends JFrame implements IGraphComman
     private JComboBox lineWidthBox;
     private JFormattedTextField multiplierField;
 
-
     @Inject
-    private TravelTimeGraphCommandWindow(final IGraphApplication app) {
+    public TravelTimeGraphCommandWindow(final IGraphApplication app) {
         super("Travel time graph command window");
         configure(app);
         buildGraphButton.addActionListener(new ActionListener() {

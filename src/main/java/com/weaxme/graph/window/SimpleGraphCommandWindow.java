@@ -27,7 +27,7 @@ public class SimpleGraphCommandWindow extends JFrame implements IGraphCommandWin
     private static final Logger LOG = LoggerFactory.getLogger(SimpleGraphCommandWindow.class);
 
     @Inject
-    private SimpleGraphCommandWindow(final IGraphApplication app) {
+    public SimpleGraphCommandWindow(final IGraphApplication app) {
         super("Simple graph command window");
         buildGraphButton.addActionListener(new ActionListener() {
             @Override
