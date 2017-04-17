@@ -46,9 +46,9 @@ public class IGraphTest {
 
     @Test
     public void testGodograph() {
-        IGraph graph = new DefaultGodographAxisGraph("1 2");
+        IGraph graph = new DefaultGodographAxisGraph("1 2", -1, 1, 0.01);
         LOG.info("graph: {}", graph);
-        List<Coordinate> coordinates = graph.computeAndGetPoints(-1, 1, 0.01);
+        List<Coordinate> coordinates = graph.getPoints();
         for (Coordinate coordinate : coordinates) {
             LOG.info("coordinate: {}", coordinate);
         }

@@ -29,10 +29,6 @@ public class GraphApplication implements IGraphApplication {
     private boolean nowRepaint = false;
     private boolean build      = false;
 
-    private double min = -10;
-    private double max = 10;
-    private double step = 0.01;
-
     @Override
     public IGraphApplication updateGraph(PixelCoordinate point1, PixelCoordinate point2) {
         graphPanel.addVectorAndRepaint(point1, point2);
@@ -50,13 +46,10 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
-    public IGraphApplication setGraph(IGraph graph, double min, double max, double step) {
+    public IGraphApplication setGraph(IGraph graph) {
         if (graph == null)
             throw new IllegalArgumentException("graph cannot be null!");
         this.graph = graph;
-        this.min = min;
-        this.max = max;
-        this.step = step;
         return this;
     }
 
@@ -127,7 +120,7 @@ public class GraphApplication implements IGraphApplication {
     @Override
     public List<Coordinate> getGraphPoints() {
         if (graph != null) {
-            return graph.computeAndGetPoints(min, max, step);
+            return graph.getPoints();
         }
         return Lists.newArrayList();
     }

@@ -1,9 +1,7 @@
 package com.weaxme.graph.service.impl;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.weaxme.graph.service.Coordinate;
-import com.weaxme.graph.service.IGraph;
 import org.apache.commons.math3.complex.Complex;
 
 import java.util.List;
@@ -15,61 +13,27 @@ import java.util.List;
  * equals
  * 1 + 3p + 4p^2 - 5p^3 - 34p^4 - p^5
  */
-public class DefaultGodographAxisGraph implements IGraph {
+public class DefaultGodographAxisGraph extends AbstractGraph {
 
-    private String function;
+    private List<Double> coefficients;
 
-    private final List<Double> coefficients    = Lists.newArrayList();
-    private final List<Coordinate> points = Lists.newArrayList();
-
-    private final Object lock = new Object();
-
-    public DefaultGodographAxisGraph(String function) {
-        setNewGraphFunction(function);
+    public DefaultGodographAxisGraph(String function, double min, double max, double step) {
+        super(function, min, max, step);
     }
 
     @Override
-    public IGraph setNewGraphFunction(String function) {
-        if (Strings.isNullOrEmpty(function))
-            throw new IllegalArgumentException("function cannot be null or empty: " + function);
-        if (!function.contains(" "))
-            throw new IllegalArgumentException("function must be like '1 3 4 -5 -34 -1'. "
-                                                + "It is equals '1 + 3p^1 + 4p^2 - 5p^3 - 34p^4 - p^5'");
-        this.function = function;
-        coefficients.clear();
-        points.clear();
-        initCoefficients();
-        return this;
-    }
-
-    @Override
-    public String getGraphFunction() {
-        return function;
-    }
-
-    @Override
-    public IGraph refresh() {
-        coefficients.clear();
-        points.clear();
-        initCoefficients();
-        return this;
-    }
-
-    @Override
-    public List<Coordinate> computeAndGetPoints(double min, double max, double step) {
-        if (points.size() == 0) {
-            while (min <= max) {
-                Complex complex = computeW(min);
-                points.add(new Coordinate(complex.getReal(), complex.getImaginary()));
-                min += step;
-            }
+    protected void compute(List<Coordinate> points, double min, double max, double step) {
+        while (min <= max) {
+            Complex complex = computeW(min);
+            points.add(new Coordinate(complex.getReal(), complex.getImaginary()));
+            min += step;
         }
-        return points;
     }
 
-
-    private void initCoefficients() {
-        String coeffs[] = function.split(" ");
+    @Override
+    protected void init() {
+        coefficients = Lists.newArrayList();
+        String coeffs[] = getGraphFunction().split(" ");
         for (String c : coeffs) {
             coefficients.add(Double.valueOf(c));
         }
@@ -100,9 +64,9 @@ public class DefaultGodographAxisGraph implements IGraph {
     @Override
     public String toString() {
         return "DefaultGodographAxisGraph{" +
-                "function='" + function + '\'' +
+                "function='" + getGraphFunction() + '\'' +
                 ", coefficients=" + coefficients +
-                ", points=" + points +
+                ", points=" + getPoints() +
                 '}';
     }
 }

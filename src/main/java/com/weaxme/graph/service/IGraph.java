@@ -7,8 +7,8 @@ import java.util.List;
  * @author Vitaliy Gonchar
  */
 public interface IGraph extends Serializable {
-    IGraph setNewGraphFunction(String function);
+    IGraph setNewGraphFunction(String function, double min, double max, double step);
     String getGraphFunction();
     IGraph refresh();
-    List<Coordinate> computeAndGetPoints(double min, double max, double step);
+    List<Coordinate> getPoints();
 }

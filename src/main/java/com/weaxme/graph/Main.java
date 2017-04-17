@@ -36,7 +36,7 @@ public class Main {
                 frame.setVisible(true);
                 injector.getInstance(IGraphApplication.class)
                         .setGraphPanel(graphPanel)
-                        .setGraph(new DefaultGodographAxisGraph("6 13 9 2"), -100, 100, 0.01)
+                        .setGraph(new DefaultGodographAxisGraph("6 13 9 2", -10, 10, 0.01))
                         .repaintGraph();
                 injector.getInstance(SimpleGraphCommandWindow.class).setVisible(true);
             }

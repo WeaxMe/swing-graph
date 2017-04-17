@@ -2,24 +2,15 @@ package com.weaxme.graph.service.impl;
 
 import com.google.common.collect.Lists;
 import com.weaxme.graph.service.Coordinate;
-import com.weaxme.graph.service.IGraph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 /**
  * @author Vitaliy Gonchar
  */
-public class SimpleGraph implements IGraph {
-    private String function;
+public class SimpleGraph extends AbstractGraph {
 
-    public static final String VAR         = "x";
-    public static final String COMPLEX_VAR = "w";
-
-    private boolean complex;
-
-    private static final Logger LOG = LoggerFactory.getLogger(SimpleGraph.class);
+    public static final String VAR  = "x";
 
     private static final List<String> ARITHMETIC_SIGNS = Lists.newArrayList();
     static {
@@ -29,45 +20,19 @@ public class SimpleGraph implements IGraph {
         ARITHMETIC_SIGNS.add("*");
     }
 
-    public SimpleGraph(String function) {
-        this.function = function;
-        if (function.contains(VAR)) complex = false;
+    protected SimpleGraph(String function, double min, double max, double step) {
+        super(function, min, max, step);
+    }
+
+
+    @Override
+    protected void compute(List<Coordinate> points, double min, double max, double step) {
+
     }
 
     @Override
-    public IGraph setNewGraphFunction(String function) {
-        this.function = function;
-        if (this.function.contains(VAR)) complex = false;
-        return this;
+    protected void init() {
+
     }
 
-    @Override
-    public String getGraphFunction() {
-        return function;
-    }
-
-    @Override
-    public IGraph refresh() {
-        return null;
-    }
-
-    @Override
-    public List<Coordinate> computeAndGetPoints(double min, double max, double step) {
-        List<Coordinate> points = Lists.newArrayList();
-        if (step == 0) return Lists.newArrayList();
-        while (min <= max) {
-            points.add(new Coordinate(min, computeX(min)));
-            min += step;
-        }
-        return points;
-    }
-
-    // x + x * x * x + 18
-    @SuppressWarnings("unchecked")
-    protected double computeX(double x) {
-        String expression = complex ? function.replace(COMPLEX_VAR, Double.toString(x)) : function.replace(VAR, Double.toString(x));
-        double result = 0;
-
-        return result;
-    }
 }

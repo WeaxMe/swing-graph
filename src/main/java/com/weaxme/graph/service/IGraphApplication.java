@@ -13,7 +13,7 @@ import java.util.List;
 public interface IGraphApplication extends Serializable {
     public IGraphApplication updateGraph(PixelCoordinate point1, PixelCoordinate point2);
     public IGraphApplication repaintGraph();
-    public IGraphApplication setGraph(IGraph graph, double min, double max, double step);
+    public IGraphApplication setGraph(IGraph graph);
     public IGraphApplication updateGraphDelay(long delay);
     public IGraphApplication setPixelStep(int pixelStep);
     public IGraphApplication setBorderPixelLimit(int limit);
