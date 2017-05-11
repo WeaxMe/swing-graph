@@ -1,8 +1,8 @@
-package com.weaxme.graph.window;
+package com.weaxme.graph.component;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.weaxme.graph.service.IGraphApplication;
+import com.weaxme.graph.application.IGraphApplication;
 import com.weaxme.graph.service.IGraphCommandWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ public class SimpleGraphCommandWindow extends JFrame implements IGraphCommandWin
 
     @Inject
     public SimpleGraphCommandWindow(final IGraphApplication app) {
-        super("Simple graph command window");
+        super("Simple graph command component");
         buildGraphButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {

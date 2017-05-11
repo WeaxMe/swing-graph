@@ -1,11 +1,11 @@
-package com.weaxme.graph.window;
+package com.weaxme.graph.component;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.weaxme.graph.service.IGraph;
-import com.weaxme.graph.service.IGraphApplication;
+import com.weaxme.graph.application.graph.IGraph;
+import com.weaxme.graph.application.IGraphApplication;
 import com.weaxme.graph.service.IGraphCommandWindow;
-import com.weaxme.graph.service.impl.DefaultGodographAxisGraph;
+import com.weaxme.graph.application.graph.DefaultGodographAxisGraph;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -32,7 +32,7 @@ public class TravelTimeGraphCommandWindow extends JFrame implements IGraphComman
 
     @Inject
     public TravelTimeGraphCommandWindow(final IGraphApplication app) {
-        super("Travel time graph command window");
+        super("Travel time graph command component");
         configure(app);
         buildGraphButton.addActionListener(new ActionListener() {
             @Override
@@ -43,7 +43,6 @@ public class TravelTimeGraphCommandWindow extends JFrame implements IGraphComman
                 double step = (Double) stepField.getValue();
                 if (step <= 0) step = app.getGraph().getStep();
                 app.setGraph(new DefaultGodographAxisGraph(function, min, max, step));
-                app.setPixelStep((Integer) pixelStepField.getValue());
                 app.setGraphDelay((Long) delayField.getValue());
                 app.repaintGraph();
             }
@@ -64,7 +63,7 @@ public class TravelTimeGraphCommandWindow extends JFrame implements IGraphComman
             stepField.setValue(graph.getStep());
         }
         delayField.setValue(app.getGraphDelay());
-        pixelStepField.setValue(app.getPixelStep());
+        pixelStepField.setValue(app.getMarkPixelStep());
         multiplierField.setValue(app.getPointMultiplier());
         multiplierField.addPropertyChangeListener("value", new PropertyChangeListener() {
             @Override
@@ -74,13 +73,6 @@ public class TravelTimeGraphCommandWindow extends JFrame implements IGraphComman
                     app.setPointMultiplier(multiplier);
                     app.repaintGraphWithoutDelay();
                 }
-            }
-        });
-        pixelStepField.addPropertyChangeListener("value", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                app.setPixelStep((Integer) pixelStepField.getValue());
-                app.repaintGraphWithoutDelay();
             }
         });
         configureWidthBox(app);

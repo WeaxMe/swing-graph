@@ -3,13 +3,13 @@ package com.weaxme.graph;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.weaxme.graph.service.GraphInitModule;
-import com.weaxme.graph.service.IGraphApplication;
+import com.weaxme.graph.application.IGraphApplication;
 import com.weaxme.graph.service.IGraphCommandWindow;
 import com.weaxme.graph.service.IGraphPanel;
-import com.weaxme.graph.service.impl.DefaultGodographAxisGraph;
-import com.weaxme.graph.window.GraphWindow;
-import com.weaxme.graph.window.SimpleGraphCommandWindow;
-import com.weaxme.graph.window.TravelTimeGraphCommandWindow;
+import com.weaxme.graph.application.graph.DefaultGodographAxisGraph;
+import com.weaxme.graph.component.GraphWindow;
+import com.weaxme.graph.component.SimpleGraphCommandWindow;
+import com.weaxme.graph.component.TravelTimeGraphCommandWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class Main {
 
                 injector.getInstance(IGraphApplication.class)
                         .setGraphPanel(graphPanel)
-                        .setGraph(new DefaultGodographAxisGraph("6 13 9 2", -10, 10, 0.01))
+                        .setGraph(new DefaultGodographAxisGraph("6 13 9 2",0, 100, 0.01))
                         .repaintGraph();
                 IGraphCommandWindow travel = injector.getInstance(TravelTimeGraphCommandWindow.class);
                 IGraphCommandWindow simple = injector.getInstance(SimpleGraphCommandWindow.class);

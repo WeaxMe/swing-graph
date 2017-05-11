@@ -1,4 +1,4 @@
-package com.weaxme.graph.window;
+package com.weaxme.graph.component;
 
 import com.weaxme.graph.service.IGraphCommandWindow;
 import com.weaxme.graph.service.IGraphPanel;
@@ -22,7 +22,7 @@ public class GraphWindow extends JFrame {
         graphMenu.setFont(font);
         menuBar.add(graphMenu);
 
-        JMenuItem simpleGraphItem = new JMenuItem("Simple graph command window");
+        JMenuItem simpleGraphItem = new JMenuItem("Simple graph command component");
         simpleGraphItem.setFont(font);
         graphMenu.add(simpleGraphItem);
         simpleGraphItem.addActionListener(new ActionListener() {
@@ -35,7 +35,7 @@ public class GraphWindow extends JFrame {
             }
         });
 
-        JMenuItem travelTimeGraphItem = new JMenuItem("Travel time graph command window");
+        JMenuItem travelTimeGraphItem = new JMenuItem("Travel time graph command component");
         travelTimeGraphItem.setFont(font);
         graphMenu.add(travelTimeGraphItem);
         travelTimeGraphItem.addActionListener(new ActionListener() {

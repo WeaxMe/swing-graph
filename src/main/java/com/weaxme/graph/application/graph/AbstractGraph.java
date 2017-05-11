@@ -1,9 +1,8 @@
-package com.weaxme.graph.service.impl;
+package com.weaxme.graph.application.graph;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.weaxme.graph.service.Coordinate;
-import com.weaxme.graph.service.IGraph;
 
 import java.util.List;
 
@@ -22,6 +21,10 @@ public abstract class AbstractGraph implements IGraph {
     private double max;
     private double step;
 
+    protected AbstractGraph(String function, double step) {
+        setNewGraphFunction(function, step);
+    }
+
     protected AbstractGraph(String function, double min, double max, double step) {
         setNewGraphFunction(function, min, max, step);
     }
@@ -36,16 +39,29 @@ public abstract class AbstractGraph implements IGraph {
                         + "It is equals '1 + 3p^1 + 4p^2 - 5p^3 - 34p^4 - p^5'");
             this.function = function;
             refresh();
-            compute(points, min, max, step);
             this.min = min;
             this.max = max;
             this.step = step;
+            compute(points, step);
             return this;
         }
     }
 
-    protected abstract void compute(List<Coordinate> points, double min, double max, double step);
+    @Override
+    public IGraph setNewGraphFunction(String function, double step) {
+        return setNewGraphFunction(function, 0, 0, step);
+    }
+
+    protected abstract void compute(List<Coordinate> points, double step);
     protected abstract void init();
+
+    protected final void setMin(double min) {
+        this.min = min;
+    }
+
+    protected final void setMax(double max) {
+        this.max = max;
+    }
 
     @Override
     public final String getGraphFunction() {
@@ -80,4 +96,5 @@ public abstract class AbstractGraph implements IGraph {
     public double getStep() {
         return step;
     }
+
 }

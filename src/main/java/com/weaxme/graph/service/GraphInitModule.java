@@ -2,9 +2,9 @@ package com.weaxme.graph.service;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
-import com.weaxme.graph.window.SimpleGraphCommandWindow;
-import com.weaxme.graph.window.TravelTimeGraphCommandWindow;
-import com.weaxme.graph.window.panel.GraphPanel;
+import com.weaxme.graph.component.SimpleGraphCommandWindow;
+import com.weaxme.graph.component.TravelTimeGraphCommandWindow;
+import com.weaxme.graph.component.panel.GraphPanel;
 
 /**
  * @author Vitaliy Gonchar

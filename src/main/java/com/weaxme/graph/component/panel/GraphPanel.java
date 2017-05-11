@@ -1,10 +1,11 @@
-package com.weaxme.graph.window.panel;
+package com.weaxme.graph.component.panel;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.weaxme.graph.service.Coordinate;
 import com.weaxme.graph.service.GraphUpdater;
-import com.weaxme.graph.service.IGraphApplication;
+import com.weaxme.graph.application.IGraphApplication;
 import com.weaxme.graph.service.IGraphPanel;
 import com.weaxme.graph.service.PixelCoordinate;
 
@@ -31,6 +32,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
 
     private final Object lock = new Object();
 
+    private static final int AXIS_WIDTH = 1;
 
     public GraphPanel() {
         addComponentListener(new ComponentAdapter() {
@@ -85,10 +87,13 @@ public class GraphPanel extends JPanel implements IGraphPanel {
 
     private void buildAxis(Graphics2D g2d) {
         g2d.setPaint(Color.BLACK);
+        g2d.setStroke(new BasicStroke(2f));
         g2d.drawLine(app.getX0(), app.getBorderPixelLimit(), app.getX0(), app.getGraphMaxHeight());
         g2d.drawLine(app.getBorderPixelLimit(), app.getY0(), app.getGraphMaxWidth(), app.getY0());
         buildMarksOnX(g2d);
         buildMarksOnY(g2d);
+        buildGraphBorder(g2d);
+        buildAxisArrows(g2d);
     }
 
     private void buildVector(Graphics2D g2d) {
@@ -106,20 +111,73 @@ public class GraphPanel extends JPanel implements IGraphPanel {
     }
 
     private void buildMarksOnX(Graphics2D g2d) {
-        for (int x = app.getX0(); x <= app.getGraphMaxWidth(); x += app.getPixelStep()) {
+        final double step = app.getMarkStep();
+        String format = step <= 1 ? "%.3f" : step >= 10 ? "%.0f" : "%.1f";
+        double counter = step;
+        g2d.drawString("0", app.getX0() + 2, app.getY0() + 2 * markLength + 2);
+        for (int x = app.getX0() + app.getMarkPixelStep(); x <= app.getGraphMaxWidth(); x += app.getMarkPixelStep()) {
+            buildGraphAxisLine(g2d, x, app.getGraphMaxHeight(), x, app.getBorderPixelLimit());
             g2d.drawLine(x, app.getY0() + markLength, x, app.getY0() - markLength);
+            g2d.drawString(String.format(format, counter), x + 2, app.getY0() + 2 * markLength + 2);
+            counter += step;
         }
-        for (int x = app.getX0(); x >= app.getBorderPixelLimit(); x -= app.getPixelStep()) {
+        counter = -step;
+        for (int x = app.getX0() - app.getMarkPixelStep(); x >= app.getBorderPixelLimit(); x -= app.getMarkPixelStep()) {
+            buildGraphAxisLine(g2d, x, app.getGraphMaxHeight(), x, app.getBorderPixelLimit());
             g2d.drawLine(x, app.getY0() + markLength, x, app.getY0() - markLength);
+            g2d.drawString(String.format(format, counter), x + 2, app.getY0() + 2 * markLength + 2);
+            counter -= step;
         }
     }
 
     private void buildMarksOnY(Graphics2D g2d) {
-        for (int y = app.getY0(); y <= app.getGraphMaxHeight(); y += app.getPixelStep()) {
+        final double step = app.getMarkStep();
+        String format = step <= 1 ? "%.3f" : step >= 10 ? "%.0f" : "%.1f";
+        double counter = step;
+        for (int y = app.getY0() - app.getMarkPixelStep(); y >= app.getBorderPixelLimit(); y -= app.getMarkPixelStep()) {
+            buildGraphAxisLine(g2d, app.getBorderPixelLimit(), y, app.getGraphMaxWidth(), y);
             g2d.drawLine(app.getX0() + markLength, y, app.getX0() - markLength, y);
+            g2d.drawString(String.format(format, counter), app.getX0() + markLength + 2, y - 2);
+            counter += step;
         }
-        for (int y = app.getY0(); y >= app.getBorderPixelLimit(); y -= app.getPixelStep()) {
+
+        counter = -step;
+        for (int y = app.getY0() + app.getMarkPixelStep(); y <= app.getGraphMaxHeight(); y += app.getMarkPixelStep()) {
+            buildGraphAxisLine(g2d, app.getBorderPixelLimit(), y, app.getGraphMaxWidth(), y);
             g2d.drawLine(app.getX0() + markLength, y, app.getX0() - markLength, y);
+            g2d.drawString(String.format(format, counter), app.getX0() + markLength + 2, y - 2);
+            counter -= step;
         }
+    }
+
+    private void buildGraphAxisLine(Graphics2D g2d, int x0, int y0, int x1, int y1) {
+        g2d.setColor(Color.green);
+        Stroke baseStroke = g2d.getStroke();
+        g2d.setStroke(new BasicStroke(AXIS_WIDTH));
+        g2d.drawLine(x0, y0, x1, y1);
+        g2d.setStroke(baseStroke);
+        g2d.setColor(Color.black);
+    }
+
+    private void buildGraphBorder(Graphics2D g2d) {
+        int borderPixelLimit = app.getBorderPixelLimit();
+        int graphMaxWidth    = app.getGraphMaxWidth();
+        int graphMaxHeight   = app.getGraphMaxHeight();
+        g2d.drawLine(borderPixelLimit, borderPixelLimit, graphMaxWidth, borderPixelLimit);
+        g2d.drawLine(graphMaxWidth, borderPixelLimit, graphMaxWidth, graphMaxHeight);
+        g2d.drawLine(graphMaxWidth, graphMaxHeight, borderPixelLimit, graphMaxHeight);
+        g2d.drawLine(borderPixelLimit, graphMaxHeight, borderPixelLimit, borderPixelLimit);
+    }
+
+    private void buildAxisArrows(Graphics2D g2d) {
+        int borderPixelLimit = app.getBorderPixelLimit();
+        int graphMaxWidth    = app.getGraphMaxWidth();
+        int step = app.getMarkPixelStep() / 5;
+        int [] xH = {app.getX0() - step, app.getX0(), app.getX0() + step};
+        int [] yH = {borderPixelLimit + step, borderPixelLimit, borderPixelLimit + step};
+        int [] xW = {graphMaxWidth - step, graphMaxWidth, graphMaxWidth - step};
+        int [] yW = {app.getY0() + step, app.getY0(), app.getY0() - step};
+        g2d.fillPolygon(new Polygon(xH, yH, xH.length));
+        g2d.fillPolygon(new Polygon(xW, yW, xW.length));
     }
 }

@@ -1,5 +1,7 @@
 package com.weaxme.graph.service;
 
+import com.weaxme.graph.application.IGraphApplication;
+
 /**
  * @author Vitaliy Gonchar
  */

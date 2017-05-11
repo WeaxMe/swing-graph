@@ -1,5 +1,6 @@
 package com.weaxme.graph.service;
 
+import com.weaxme.graph.application.IGraphApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author Vitaliy Gonchar
  */
 public class GraphUpdater implements Runnable {
+
     private static final Logger LOG = LoggerFactory.getLogger(GraphUpdater.class);
 
     private final IGraphApplication app;
@@ -32,11 +34,11 @@ public class GraphUpdater implements Runnable {
         if (points.size() == 0) return;
         app.setNowRepaint(true);
         boolean firstPoint = true;
-        LOG.debug("Start repaint schedule");
         PixelCoordinate point1 = null;
         Iterator<Coordinate> iterator = points.iterator();
         while (iterator.hasNext()) {
-            PixelCoordinate point2 = new PixelCoordinate(iterator.next(), app);
+            Coordinate coordinate = iterator.next();
+            PixelCoordinate point2 = new PixelCoordinate(coordinate, app);
             if (point2.isValid()) {
                 if (firstPoint) {
                     point1 = point2;

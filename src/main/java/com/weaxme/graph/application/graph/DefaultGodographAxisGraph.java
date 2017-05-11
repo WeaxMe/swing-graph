@@ -1,8 +1,10 @@
-package com.weaxme.graph.service.impl;
+package com.weaxme.graph.application.graph;
 
 import com.google.common.collect.Lists;
 import com.weaxme.graph.service.Coordinate;
 import org.apache.commons.math3.complex.Complex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -15,19 +17,56 @@ import java.util.List;
  */
 public class DefaultGodographAxisGraph extends AbstractGraph {
 
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultGodographAxisGraph.class);
+
     private List<Double> coefficients;
 
     public DefaultGodographAxisGraph(String function, double min, double max, double step) {
         super(function, min, max, step);
     }
 
+    public DefaultGodographAxisGraph(String function, double step) {
+        super(function, step);
+    }
+
     @Override
-    protected void compute(List<Coordinate> points, double min, double max, double step) {
+    protected void compute(List<Coordinate> points, double step) {
+        double min = getMin();
+        double max = getMax();
+        if (min == 0 && max == 0) {
+            boolean zeroPresent;
+            max = 1;
+            min = 0;
+            for (int i = 0; i < 4; i++) {
+                zeroPresent = compute(points, min, max, step);
+                if (zeroPresent)
+                    break;
+                max *= 10;
+                points.clear();
+            }
+            setMax(max);
+            setMin(min);
+        } else {
+            compute(points, min, max, step);
+        }
+    }
+
+    private boolean compute(List<Coordinate> points, double min, double max, double step) {
+        int counter = 0;
         while (min <= max) {
             Complex complex = computeW(min);
-            points.add(new Coordinate(complex.getReal(), complex.getImaginary()));
+            if (points.size() > 0) {
+                Coordinate previous = points.get(points.size() - 1);
+                if (previous.getY() > 0 && complex.getImaginary() < 0 || complex.getImaginary() == 0) {
+                    counter++;
+                }
+            }
+            if (!complex.isNaN()) {
+                points.add(new Coordinate(complex.getReal(), complex.getImaginary()));
+            }
             min += step;
         }
+        return counter >= 1;
     }
 
     @Override

@@ -1,7 +1,8 @@
 package com.weaxme.graph.service;
 
 import com.google.common.collect.Lists;
-import com.weaxme.graph.service.impl.DefaultGodographAxisGraph;
+import com.weaxme.graph.application.graph.DefaultGodographAxisGraph;
+import com.weaxme.graph.application.graph.IGraph;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;

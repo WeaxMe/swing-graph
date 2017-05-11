@@ -1,8 +1,10 @@
-package com.weaxme.graph.service.impl;
+package com.weaxme.graph.application;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
+import com.weaxme.graph.application.graph.IGraph;
 import com.weaxme.graph.service.*;
+import com.weaxme.graph.service.util.GraphUtil;
 
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -14,19 +16,26 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class GraphApplication implements IGraphApplication {
 
+    private static final int MAX_MARKS   = 22;
+    private static final int MAX_X_MARKS = 10;
+    private static final int MAX_Y_MARKS = 10;
+
     private IGraph graph;
     private IGraphPanel graphPanel;
 
     private long delay           = 1;
-    private int pixelStep        = 10;
+    private int markPixelStep    = 10;
+    private double markStep      = 0;
     private int borderPixelLimit = 20;
     private int markLength       = 10;
     private int x0;
     private int y0;
+
     private int maxScheduleHeight;
     private int maxScheduleWidth;
 
-    private int graphLineWidth = 1;
+
+    private int graphLineWidth     = 2;
     private double pointMultiplier = 1;
 
     private boolean nowRepaint = false;
@@ -62,6 +71,9 @@ public class GraphApplication implements IGraphApplication {
         if (graph == null)
             throw new IllegalArgumentException("graph cannot be null!");
         this.graph = graph;
+        double divider = GraphUtil.getGraphMarkStep(graph.getMin(), graph.getMax());
+        this.markStep = divider / MAX_X_MARKS;
+        this.pointMultiplier = MAX_X_MARKS / divider;
         return this;
     }
 
@@ -74,13 +86,6 @@ public class GraphApplication implements IGraphApplication {
     public IGraphApplication setGraphDelay(long delay) {
         if (delay < 0) throw new IllegalArgumentException("delay cannot be < 0");
         this.delay = delay;
-        return this;
-    }
-
-    @Override
-    public IGraphApplication setPixelStep(int pixelStep) {
-        if (pixelStep <= 1) throw new IllegalArgumentException("pixel step must be > 1");
-        this.pixelStep = pixelStep;
         return this;
     }
 
@@ -114,6 +119,7 @@ public class GraphApplication implements IGraphApplication {
     @Override
     public IGraphApplication setGraphMaxWidth(int width) {
         this.maxScheduleWidth = width;
+        this.markPixelStep = width / MAX_MARKS;
         return this;
     }
 
@@ -160,8 +166,18 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
-    public int getPixelStep() {
-        return pixelStep;
+    public int getMarkPixelStep() {
+        return markPixelStep;
+    }
+
+    @Override
+    public int getXPixelStep() {
+        return 0;
+    }
+
+    @Override
+    public int getYPixelStep() {
+        return 0;
     }
 
     @Override
@@ -192,6 +208,11 @@ public class GraphApplication implements IGraphApplication {
     @Override
     public int getGraphMaxWidth() {
         return maxScheduleWidth;
+    }
+
+    @Override
+    public double getMarkStep() {
+        return markStep;
     }
 
     @Override

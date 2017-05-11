@@ -1,10 +1,12 @@
 package com.weaxme.graph.service;
 
+import com.weaxme.graph.application.IGraphApplication;
+
 import java.io.Serializable;
 
 /**
  * @author Vitaliy Gonchar
- * Represents pixel coordinates in Swing window
+ * Represents pixel coordinates in Swing component
  */
 public class PixelCoordinate implements Serializable {
     private final int x;
@@ -15,8 +17,8 @@ public class PixelCoordinate implements Serializable {
     public PixelCoordinate(Coordinate point, IGraphApplication app) {
         Double x = point.getX();
         Double y = point.getY();
-        int xLength = Math.abs((int) (x * app.getPixelStep() * app.getPointMultiplier()));
-        int yLength = Math.abs((int) (y * app.getPixelStep() * app.getPointMultiplier()));
+        int xLength = Math.abs((int) (x * app.getMarkPixelStep() * app.getPointMultiplier()));
+        int yLength = Math.abs((int) (y * app.getMarkPixelStep() * app.getPointMultiplier()));
         if (x < 0) {
             xLength = app.getX0() - Math.abs(xLength);
         } else xLength += app.getX0();
