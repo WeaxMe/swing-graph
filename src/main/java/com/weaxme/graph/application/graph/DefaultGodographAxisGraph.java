@@ -25,48 +25,62 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
         super(function, min, max, step);
     }
 
-    public DefaultGodographAxisGraph(String function, double step) {
-        super(function, step);
-    }
-
     @Override
-    protected void compute(List<Coordinate> points, double step) {
+    protected void initPoints(double step) {
         double min = getMin();
         double max = getMax();
-        if (min == 0 && max == 0) {
-            boolean zeroPresent;
-            max = 1;
-            min = 0;
-            for (int i = 0; i < 4; i++) {
-                zeroPresent = compute(points, min, max, step);
-                if (zeroPresent)
-                    break;
-                max *= 10;
-                points.clear();
-            }
-            setMax(max);
-            setMin(min);
-        } else {
-            compute(points, min, max, step);
-        }
-    }
-
-    private boolean compute(List<Coordinate> points, double min, double max, double step) {
-        int counter = 0;
+        boolean previousIsNaN = false;
         while (min <= max) {
-            Complex complex = computeW(min);
-            if (points.size() > 0) {
-                Coordinate previous = points.get(points.size() - 1);
-                if (previous.getY() > 0 && complex.getImaginary() < 0 || complex.getImaginary() == 0) {
-                    counter++;
+            Coordinate point = compute(min);
+            if (pointsSize() > 0) {
+                Coordinate previous = getLastPoint();
+                if (previous.getY() > 0 && point.getY() < 0
+                        || previous.getY() < 0 && point.getY() > 0
+                        || point.getY() == 0) {
+                    Coordinate zeroY = getZeroFromSegment(previous.getX(), point.getX(), false);
+                    addXZeroPoint(zeroY);
                 }
+
+                if (previous.getX() > 0 && point.getX() < 0
+                        || previous.getX() < 0 && point.getX() > 0
+                        || point.getX() == 0) {
+                    Coordinate zeroX = getZeroFromSegment(previous.getY(), point.getY(), true);
+                    addYZeroPoint(zeroX);
+                }
+            } else if (previousIsNaN && point.getY() < 0.5) {
+                addXZeroPoint(point);
             }
-            if (!complex.isNaN()) {
-                points.add(new Coordinate(complex.getReal(), complex.getImaginary()));
+            if (!point.isNaN()) {
+                addPoint(point);
+                previousIsNaN = false;
+            } else {
+                previousIsNaN = true;
             }
             min += step;
         }
-        return counter >= 1;
+    }
+
+    public Coordinate getZeroFromSegment(double first, double second, boolean yAxis) {
+        if (Double.isNaN(first) || Double.isNaN(second))
+            throw new IllegalArgumentException("first or second is NaN");
+        Coordinate zero;
+        while (true) {
+            double res = (first + second) / 2;
+            if (res == first || res == second) {
+                zero = yAxis ? new Coordinate(0.0, res) : new Coordinate(res, 0.0);
+                break;
+            }
+            if (compute(res).getY() < 0) {
+                first = res;
+            } else second = res;
+        }
+        return zero;
+    }
+
+    private Complex searchZero(Complex first, Complex second, double baseStep) {
+        Complex zero = new Complex(-1);
+
+        return zero;
     }
 
     @Override
@@ -78,28 +92,6 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
         }
     }
 
-    /**
-     * i * i = -1
-     * i * i * i = -i
-     * i * i * i * i = 1
-     * i * i * i * i * i = -i
-     * i * i * i * i * i * i = -1
-     * @param w angular frequency
-     * @return complex result of function
-     */
-    private Complex computeW(double w) {
-        int count = 0;
-        Complex result = new Complex(0, 0);
-        Complex j = new Complex(0, 1).multiply(w);
-        for (Double coeff : coefficients) {
-            Complex pow = j.pow(count);
-            Complex multiply = pow.multiply(coeff);
-            result = result.add(multiply);
-            count++;
-        }
-        return result;
-    }
-
     @Override
     public String toString() {
         return "DefaultGodographAxisGraph{" +
@@ -107,5 +99,30 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
                 ", coefficients=" + coefficients +
                 ", points=" + getPoints() +
                 '}';
+    }
+
+
+
+    /**
+     * i * i = -1
+     * i * i * i = -i
+     * i * i * i * i = 1
+     * i * i * i * i * i = -i
+     * i * i * i * i * i * i = -1
+     * @param x angular frequency
+     * @return complex result of function
+     */
+    @Override
+    public Coordinate compute(double x) {
+        int count = 0;
+        Complex result = new Complex(0, 0);
+        Complex j = new Complex(0, 1).multiply(x);
+        for (Double coeff : coefficients) {
+            Complex pow = j.pow(count);
+            Complex multiply = pow.multiply(coeff);
+            result = result.add(multiply);
+            count++;
+        }
+        return new Coordinate(result.getReal(), result.getImaginary());
     }
 }

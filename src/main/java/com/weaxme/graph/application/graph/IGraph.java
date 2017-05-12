@@ -1,6 +1,7 @@
 package com.weaxme.graph.application.graph;
 
 import com.weaxme.graph.service.Coordinate;
+import org.apache.commons.math3.complex.Complex;
 
 import java.io.Serializable;
 import java.util.List;
@@ -9,12 +10,15 @@ import java.util.List;
  * @author Vitaliy Gonchar
  */
 public interface IGraph extends Serializable {
-    IGraph setNewGraphFunction(String function, double min, double max, double step);
-    IGraph setNewGraphFunction(String function, double step);
-    String getGraphFunction();
-    IGraph refresh();
-    List<Coordinate> getPoints();
-    double getMin();
-    double getMax();
-    double getStep();
+    public IGraph setNewGraphFunction(String function, double min, double max, double step);
+    public Coordinate compute(double x);
+    public String getGraphFunction();
+    public IGraph refresh();
+    public List<Coordinate> getPoints();
+    public List<Coordinate> getXZeroPoints();
+    public List<Coordinate> getYZeroPoints();
+    public double getMin();
+    public double getMax();
+    public double getStep();
+    public double getMarkStep();
 }

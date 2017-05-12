@@ -1,6 +1,8 @@
 package com.weaxme.graph.service;
 
+import com.google.common.collect.Lists;
 import com.weaxme.graph.application.IGraphApplication;
+import com.weaxme.graph.application.graph.IGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,9 +32,13 @@ public class GraphUpdater implements Runnable {
 
     @Override
     public void run() {
-        List<Coordinate> points = app.getGraphPoints();
-        if (points.size() == 0) return;
         app.setNowRepaint(true);
+        IGraph graph = app.getGraph();
+        List<Coordinate> points = graph != null ? graph.getPoints() : Lists.<Coordinate>newArrayList();
+        if (points.size() == 0) {
+            app.setNowRepaint(false);
+            return;
+        }
         boolean firstPoint = true;
         PixelCoordinate point1 = null;
         Iterator<Coordinate> iterator = points.iterator();
@@ -49,8 +55,8 @@ public class GraphUpdater implements Runnable {
                 point1 = point2;
             }
         }
+        app.buildGraphAxisZeroLines();
         app.setNowRepaint(false);
-
     }
 
     private void delay() {

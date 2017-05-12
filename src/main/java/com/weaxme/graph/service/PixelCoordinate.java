@@ -1,6 +1,8 @@
 package com.weaxme.graph.service;
 
 import com.weaxme.graph.application.IGraphApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
@@ -12,22 +14,28 @@ public class PixelCoordinate implements Serializable {
     private final int x;
     private final int y;
 
+    private final Coordinate point;
+
     private final boolean valid;
 
+    private static final Logger LOG = LoggerFactory.getLogger(PixelCoordinate.class);
+
     public PixelCoordinate(Coordinate point, IGraphApplication app) {
+        this.point = point;
         Double x = point.getX();
         Double y = point.getY();
-        int xLength = Math.abs((int) (x * app.getMarkPixelStep() * app.getPointMultiplier()));
-        int yLength = Math.abs((int) (y * app.getMarkPixelStep() * app.getPointMultiplier()));
+        int xLength = (int) Math.abs(x * app.getMarkPixelStep() * app.getPointMultiplier());
+        int yLength = (int) Math.abs(y * app.getMarkPixelStep() * app.getPointMultiplier());
         if (x < 0) {
-            xLength = app.getX0() - Math.abs(xLength);
+            xLength = app.getX0() - xLength;
         } else xLength += app.getX0();
+
         if (y < 0) {
-            yLength = Math.abs(app.getY0() + Math.abs(yLength));
+            yLength = Math.abs(app.getY0() + yLength);
         } else yLength = app.getY0() - yLength;
 
         if (yLength > app.getGraphMaxHeight() || xLength > app.getGraphMaxWidth()
-                || yLength < app.getBorderPixelLimit() || xLength < app.getBorderPixelLimit() || xLength < 0 || yLength < 0) {
+                || yLength < app.getBorderPixelLimit() || xLength < app.getBorderPixelLimit() || xLength <= 0 || yLength <= 0) {
             this.x = -1;
             this.y = -1;
             valid = false;
@@ -48,6 +56,10 @@ public class PixelCoordinate implements Serializable {
 
     public boolean isValid() {
         return valid;
+    }
+
+    public Coordinate getPoint() {
+        return point;
     }
 
     @Override

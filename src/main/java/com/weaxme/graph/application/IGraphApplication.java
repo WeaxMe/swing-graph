@@ -14,8 +14,13 @@ import java.util.List;
  */
 @ImplementedBy(GraphApplication.class)
 public interface IGraphApplication extends Serializable {
+    public static final int MAX_MARKS   = 22;
+    public static final int MAX_X_MARKS = 10;
+    public static final int MAX_Y_MARKS = 10;
+
     public IGraphApplication updateGraph(PixelCoordinate point1, PixelCoordinate point2);
-    public IGraphApplication repaintGraph();
+    public IGraphApplication buildGraphAxisZeroLines();
+    public IGraphApplication repaintGraph(long delay);
     public IGraphApplication repaintGraphWithoutDelay();
     public IGraphApplication setGraph(IGraph graph);
     public IGraphApplication setGraphDelay(long delay);
@@ -43,7 +48,6 @@ public interface IGraphApplication extends Serializable {
     public int getGraphMaxHeight();
     public int getGraphMaxWidth();
     public double getMarkStep();
-    public List<Coordinate> getGraphPoints();
     public IGraphPanel getGraphPanel();
     public boolean isNowGraphBuild();
     public int getGraphLineWidth();

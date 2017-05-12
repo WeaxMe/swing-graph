@@ -25,10 +25,17 @@ public class GraphPanel extends JPanel implements IGraphPanel {
     @Inject
     private IGraphApplication app;
 
+    private static final Color GRAPH_COLOR = Color.RED;
+    private static final Color ZERO_COLOR  = Color.CYAN;
+    private static final Color TEXT_COLOR  = Color.BLACK;
+
     private int markLength;
 
     private final List<PixelCoordinate> points1 = Lists.newArrayList();
     private final List<PixelCoordinate> points2 = Lists.newArrayList();
+
+    private final List<PixelCoordinate> xZeroes = Lists.newArrayList();
+    private final List<PixelCoordinate> yZeroes = Lists.newArrayList();
 
     private final Object lock = new Object();
 
@@ -49,6 +56,8 @@ public class GraphPanel extends JPanel implements IGraphPanel {
         synchronized (lock) {
             points1.clear();
             points2.clear();
+            xZeroes.clear();
+            yZeroes.clear();
             repaint();
         }
     }
@@ -56,15 +65,30 @@ public class GraphPanel extends JPanel implements IGraphPanel {
     @Override
     public void addVectorAndRepaint(PixelCoordinate point1, PixelCoordinate point2) {
         if (point1 == null)
-            throw new IllegalArgumentException("point1 cannot be null!");
+            throw new IllegalArgumentException("point1 can't be null!");
         if (point2 == null)
-            throw new IllegalArgumentException("point2 cannot be null!");
+            throw new IllegalArgumentException("point2 can't be null!");
         synchronized (lock) {
             points1.add(point1);
             points2.add(point2);
             repaint();
         }
     }
+
+    @Override
+    public void addZeroPointsAndRepaint(PixelCoordinate zero, boolean yAxis) {
+        if (zero == null)
+            throw new IllegalArgumentException("zero can't be null!");
+        synchronized (lock) {
+            if (yAxis) {
+                if (!yZeroes.contains(zero)) yZeroes.add(zero);
+            } else {
+                if (!xZeroes.contains(zero)) xZeroes.add(zero);
+            }
+            repaint();
+        }
+    }
+
 
     @Override
     public IGraphApplication getApplication() {
@@ -83,6 +107,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
         markLength = app.getMarkLength() / 2;
         buildAxis(g2d);
         buildVector(g2d);
+        buildZeroes(g2d);
     }
 
     private void buildAxis(Graphics2D g2d) {
@@ -98,7 +123,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
 
     private void buildVector(Graphics2D g2d) {
         synchronized (lock) {
-            g2d.setPaint(Color.RED);
+            g2d.setPaint(GRAPH_COLOR);
             g2d.setStroke(new BasicStroke(app.getGraphLineWidth()));
             Iterator<PixelCoordinate> iterator1 = points1.iterator();
             Iterator<PixelCoordinate> iterator2 = points2.iterator();
@@ -110,9 +135,46 @@ public class GraphPanel extends JPanel implements IGraphPanel {
         }
     }
 
+    private void buildZeroes(Graphics2D g2d) {
+        synchronized (lock) {
+            Stroke previousStroke = g2d.getStroke();
+            Color previousColor = g2d.getColor();
+            g2d.setColor(Color.black);
+            g2d.setStroke(new BasicStroke(1));
+            buildXZeroes(g2d);
+            buildYZeroes(g2d);
+            g2d.setStroke(previousStroke);
+            g2d.setColor(previousColor);
+        }
+    }
+
+    private void buildXZeroes(Graphics2D g2d) {
+        final int length = app.getGraphMaxHeight() / 20;
+        for (PixelCoordinate point : xZeroes) {
+            if (point.isValid()) {
+                g2d.drawLine(point.getX(), app.getY0(), point.getX(), app.getY0() + length);
+                double x = point.getPoint().getX();
+                String format = getDoubleFormat(x);
+                g2d.drawString(String.format(format, x), point.getX() + 5, app.getY0() + length + length / 2);
+            }
+        }
+    }
+
+    private void buildYZeroes(Graphics2D g2d) {
+        final int length = app.getGraphMaxWidth() / 20;
+        for (PixelCoordinate point : yZeroes) {
+            if (point.isValid()) {
+                g2d.drawLine(app.getX0(), point.getY(), app.getX0() + length, point.getY());
+                double y = point.getPoint().getY();
+                String format = getDoubleFormat(y);
+                g2d.drawString(String.format(format, y), app.getX0() + length + length / 2, point.getY());
+            }
+        }
+    }
+
     private void buildMarksOnX(Graphics2D g2d) {
         final double step = app.getMarkStep();
-        String format = step <= 1 ? "%.3f" : step >= 10 ? "%.0f" : "%.1f";
+        String format = getDoubleFormat(step);
         double counter = step;
         g2d.drawString("0", app.getX0() + 2, app.getY0() + 2 * markLength + 2);
         for (int x = app.getX0() + app.getMarkPixelStep(); x <= app.getGraphMaxWidth(); x += app.getMarkPixelStep()) {
@@ -132,7 +194,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
 
     private void buildMarksOnY(Graphics2D g2d) {
         final double step = app.getMarkStep();
-        String format = step <= 1 ? "%.3f" : step >= 10 ? "%.0f" : "%.1f";
+        String format = getDoubleFormat(step);
         double counter = step;
         for (int y = app.getY0() - app.getMarkPixelStep(); y >= app.getBorderPixelLimit(); y -= app.getMarkPixelStep()) {
             buildGraphAxisLine(g2d, app.getBorderPixelLimit(), y, app.getGraphMaxWidth(), y);
@@ -179,5 +241,10 @@ public class GraphPanel extends JPanel implements IGraphPanel {
         int [] yW = {app.getY0() + step, app.getY0(), app.getY0() - step};
         g2d.fillPolygon(new Polygon(xH, yH, xH.length));
         g2d.fillPolygon(new Polygon(xW, yW, xW.length));
+    }
+
+
+    private String getDoubleFormat(double number) {
+        return number < 1 ? "%.3f" : number >= 10 ? "%.0f" : "%.1f";
     }
 }

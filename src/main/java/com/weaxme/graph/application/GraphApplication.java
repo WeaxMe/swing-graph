@@ -16,10 +16,6 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class GraphApplication implements IGraphApplication {
 
-    private static final int MAX_MARKS   = 22;
-    private static final int MAX_X_MARKS = 10;
-    private static final int MAX_Y_MARKS = 10;
-
     private IGraph graph;
     private IGraphPanel graphPanel;
 
@@ -48,11 +44,25 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
-    public IGraphApplication repaintGraph() {
+    public IGraphApplication buildGraphAxisZeroLines() {
+        if (graph == null)
+            return this;
+        for (Coordinate point : graph.getXZeroPoints()) {
+            graphPanel.addZeroPointsAndRepaint(new PixelCoordinate(point, this), false);
+        }
+        for (Coordinate point : graph.getYZeroPoints()) {
+            graphPanel.addZeroPointsAndRepaint(new PixelCoordinate(point, this), true);
+        }
+        return this;
+    }
+
+
+    @Override
+    public IGraphApplication repaintGraph(long delay) {
         if (!nowRepaint) {
             graphPanel.clearAndRepaint();
             ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
-            executor.schedule(new GraphUpdater(this), 1, TimeUnit.SECONDS);
+            executor.schedule(new GraphUpdater(this), delay, TimeUnit.MILLISECONDS);
         }
         return this;
     }
@@ -71,9 +81,8 @@ public class GraphApplication implements IGraphApplication {
         if (graph == null)
             throw new IllegalArgumentException("graph cannot be null!");
         this.graph = graph;
-        double divider = GraphUtil.getGraphMarkStep(graph.getMin(), graph.getMax());
-        this.markStep = divider / MAX_X_MARKS;
-        this.pointMultiplier = MAX_X_MARKS / divider;
+        this.markStep = graph.getMarkStep();
+        this.pointMultiplier = 1 / markStep;
         return this;
     }
 
@@ -138,14 +147,6 @@ public class GraphApplication implements IGraphApplication {
     @Override
     public long getGraphDelay() {
         return delay;
-    }
-
-    @Override
-    public List<Coordinate> getGraphPoints() {
-        if (graph != null) {
-            return graph.getPoints();
-        }
-        return Lists.newArrayList();
     }
 
     @Override

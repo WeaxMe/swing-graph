@@ -44,7 +44,7 @@ public class TravelTimeGraphCommandWindow extends JFrame implements IGraphComman
                 if (step <= 0) step = app.getGraph().getStep();
                 app.setGraph(new DefaultGodographAxisGraph(function, min, max, step));
                 app.setGraphDelay((Long) delayField.getValue());
-                app.repaintGraph();
+                app.repaintGraph(1000);
             }
         });
         setContentPane(rootPanel);

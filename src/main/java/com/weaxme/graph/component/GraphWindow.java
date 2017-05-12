@@ -13,7 +13,7 @@ import java.awt.event.ActionListener;
  */
 public class GraphWindow extends JFrame {
 
-    public GraphWindow(IGraphPanel graphPanel, Dimension dimension, final IGraphCommandWindow simple, final IGraphCommandWindow travel) {
+    public GraphWindow(IGraphPanel graphPanel, Dimension dimension, final IGraphCommandWindow travel) {
         super("Graph");
         add((Component) graphPanel);
         JMenuBar menuBar = new JMenuBar();
@@ -22,28 +22,12 @@ public class GraphWindow extends JFrame {
         graphMenu.setFont(font);
         menuBar.add(graphMenu);
 
-        JMenuItem simpleGraphItem = new JMenuItem("Simple graph command component");
-        simpleGraphItem.setFont(font);
-        graphMenu.add(simpleGraphItem);
-        simpleGraphItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                if (travel.isWindowEnable()) {
-                    travel.windowDisable();
-                }
-                simple.windowEnable();
-            }
-        });
-
         JMenuItem travelTimeGraphItem = new JMenuItem("Travel time graph command component");
         travelTimeGraphItem.setFont(font);
         graphMenu.add(travelTimeGraphItem);
         travelTimeGraphItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                if (simple.isWindowEnable()) {
-                    simple.windowDisable();
-                }
                 travel.windowEnable();
             }
         });

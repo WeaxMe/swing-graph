@@ -24,6 +24,10 @@ public class Coordinate implements Serializable {
         return y;
     }
 
+    public boolean isNaN() {
+        return Double.isNaN(x) || Double.isNaN(y);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

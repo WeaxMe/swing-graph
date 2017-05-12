@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Vitaliy Gonchar
@@ -40,7 +41,7 @@ public class IGraphTest {
 
     @Test
     public void testJavaCompute() {
-        LOG.info("Java compute!");
+        LOG.info("Java initPoints!");
         List<Coordinate> trueCoordinates = xPlusX(-10, 10, 0.01);
         LOG.info("Points number: {}", trueCoordinates.size());
     }
@@ -53,6 +54,16 @@ public class IGraphTest {
         for (Coordinate coordinate : coordinates) {
             LOG.info("coordinate: {}", coordinate);
         }
+    }
+
+    @Test
+    public void testMarkSpet() {
+        IGraph graph = new DefaultGodographAxisGraph("1 2", -1, 1, 0.01);
+        assertTrue("markStep = 0.1, [-1, 1]", graph.getMarkStep() == 0.1);
+        graph.setNewGraphFunction("1 2", 0, 10, 0.01);
+        assertTrue("markStep = 1, [0, 10]", graph.getMarkStep() == 1);
+        graph.setNewGraphFunction("1 2", 0, 100, 0.01);
+        assertTrue("markStep = 10, [0, 100]", graph.getMarkStep() == 10);
     }
 
     @Ignore
