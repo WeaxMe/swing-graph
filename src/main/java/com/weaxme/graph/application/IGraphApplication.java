@@ -1,10 +1,9 @@
 package com.weaxme.graph.application;
 
 import com.google.inject.ImplementedBy;
-import com.weaxme.graph.service.Coordinate;
 import com.weaxme.graph.application.graph.IGraph;
-import com.weaxme.graph.service.IGraphPanel;
-import com.weaxme.graph.service.PixelCoordinate;
+import com.weaxme.graph.component.panel.IGraphPanel;
+import com.weaxme.graph.application.graph.PixelCoordinate;
 
 import java.io.Serializable;
 import java.util.List;

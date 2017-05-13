@@ -3,11 +3,9 @@ package com.weaxme.graph.component.panel;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.weaxme.graph.service.Coordinate;
-import com.weaxme.graph.service.GraphUpdater;
+import com.weaxme.graph.application.GraphUpdater;
 import com.weaxme.graph.application.IGraphApplication;
-import com.weaxme.graph.service.IGraphPanel;
-import com.weaxme.graph.service.PixelCoordinate;
+import com.weaxme.graph.application.graph.PixelCoordinate;
 
 import javax.swing.*;
 import java.awt.*;

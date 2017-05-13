@@ -1,8 +1,5 @@
 package com.weaxme.graph.application.graph;
 
-import com.weaxme.graph.service.Coordinate;
-import org.apache.commons.math3.complex.Complex;
-
 import java.io.Serializable;
 import java.util.List;
 

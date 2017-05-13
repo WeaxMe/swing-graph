@@ -1,7 +1,6 @@
 package com.weaxme.graph.application.graph;
 
 import com.google.common.collect.Lists;
-import com.weaxme.graph.service.Coordinate;
 import org.apache.commons.math3.complex.Complex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
 import com.weaxme.graph.component.TravelTimeGraphCommandWindow;
 import com.weaxme.graph.component.panel.GraphPanel;
+import com.weaxme.graph.component.panel.IGraphPanel;
 
 /**
  * @author Vitaliy Gonchar

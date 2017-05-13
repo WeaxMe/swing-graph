@@ -1,4 +1,4 @@
-package com.weaxme.graph.service;
+package com.weaxme.graph.application.graph;
 
 import java.io.Serializable;
 

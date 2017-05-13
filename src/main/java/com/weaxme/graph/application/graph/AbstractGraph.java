@@ -3,7 +3,6 @@ package com.weaxme.graph.application.graph;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.weaxme.graph.application.IGraphApplication;
-import com.weaxme.graph.service.Coordinate;
 
 import java.util.Collections;
 import java.util.List;

@@ -4,7 +4,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.weaxme.graph.application.graph.IGraph;
 import com.weaxme.graph.application.IGraphApplication;
-import com.weaxme.graph.service.IGraphCommandWindow;
 import com.weaxme.graph.application.graph.DefaultGodographAxisGraph;
 
 import javax.swing.*;
@@ -44,7 +43,7 @@ public class TravelTimeGraphCommandWindow extends JFrame implements IGraphComman
                 if (step <= 0) step = app.getGraph().getStep();
                 app.setGraph(new DefaultGodographAxisGraph(function, min, max, step));
                 app.setGraphDelay((Long) delayField.getValue());
-                app.repaintGraph(1000);
+                app.repaintGraph(0);
             }
         });
         setContentPane(rootPanel);

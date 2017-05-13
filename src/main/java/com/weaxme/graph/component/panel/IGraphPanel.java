@@ -1,8 +1,7 @@
-package com.weaxme.graph.service;
+package com.weaxme.graph.component.panel;
 
 import com.weaxme.graph.application.IGraphApplication;
-
-import java.util.List;
+import com.weaxme.graph.application.graph.PixelCoordinate;
 
 /**
  * @author Vitaliy Gonchar

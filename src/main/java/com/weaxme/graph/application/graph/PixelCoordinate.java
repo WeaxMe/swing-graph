@@ -1,4 +1,4 @@
-package com.weaxme.graph.service;
+package com.weaxme.graph.application.graph;
 
 import com.weaxme.graph.application.IGraphApplication;
 import org.slf4j.Logger;

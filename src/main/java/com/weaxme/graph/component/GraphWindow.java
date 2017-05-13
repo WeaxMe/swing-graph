@@ -1,7 +1,6 @@
 package com.weaxme.graph.component;
 
-import com.weaxme.graph.service.IGraphCommandWindow;
-import com.weaxme.graph.service.IGraphPanel;
+import com.weaxme.graph.component.panel.IGraphPanel;
 
 import javax.swing.*;
 import java.awt.*;

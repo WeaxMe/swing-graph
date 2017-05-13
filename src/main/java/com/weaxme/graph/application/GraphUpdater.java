@@ -1,8 +1,9 @@
-package com.weaxme.graph.service;
+package com.weaxme.graph.application;
 
 import com.google.common.collect.Lists;
-import com.weaxme.graph.application.IGraphApplication;
+import com.weaxme.graph.application.graph.Coordinate;
 import com.weaxme.graph.application.graph.IGraph;
+import com.weaxme.graph.application.graph.PixelCoordinate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

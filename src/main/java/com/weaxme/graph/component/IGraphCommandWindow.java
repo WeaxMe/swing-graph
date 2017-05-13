@@ -1,4 +1,4 @@
-package com.weaxme.graph.service;
+package com.weaxme.graph.component;
 
 /**
  * @author Vitaliy Gonchar

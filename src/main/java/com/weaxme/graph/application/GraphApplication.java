@@ -2,8 +2,10 @@ package com.weaxme.graph.application;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
+import com.weaxme.graph.application.graph.Coordinate;
 import com.weaxme.graph.application.graph.IGraph;
-import com.weaxme.graph.service.*;
+import com.weaxme.graph.application.graph.PixelCoordinate;
+import com.weaxme.graph.component.panel.IGraphPanel;
 
 
 import java.util.List;
