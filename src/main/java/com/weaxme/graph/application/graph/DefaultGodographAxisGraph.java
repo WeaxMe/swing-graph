@@ -17,44 +17,10 @@ import java.util.concurrent.*;
  */
 public class DefaultGodographAxisGraph extends AbstractGraph {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultGodographAxisGraph.class);
-
     private List<Double> coefficients;
 
     public DefaultGodographAxisGraph(String function, double min, double max, double step) {
         super(function, min, max, step);
-    }
-
-    @Override
-    protected void initPoints(double step) {
-        double min = getMin();
-        final int availableProcessors = Runtime.getRuntime().availableProcessors();
-        final double zone =  Math.abs(getMax() - min) / availableProcessors;
-        ExecutorService executorService = Executors.newFixedThreadPool(availableProcessors + 1);
-        List<FutureTask<List<Coordinate>>> tasks = Lists.newArrayList();
-        List<GraphComputer> graphComputers = Lists.newArrayList();
-        for (int i = 0; i < availableProcessors; i++) {
-            double newMax = min + zone;
-            GraphComputer computer = new GraphComputer(coefficients, min, newMax, step);
-            tasks.add(new FutureTask<>(computer));
-            graphComputers.add(computer);
-            min = newMax;
-        }
-
-        for (FutureTask<List<Coordinate>> task : tasks) {
-            executorService.execute(task);
-        }
-
-        for (int i = 0; i < tasks.size(); i++) {
-            try {
-                addPoints(tasks.get(i).get());
-                addXZeroPoints(graphComputers.get(i).getXZeroes());
-                addYZeroPoints(graphComputers.get(i).getYZeroes());
-            } catch (InterruptedException | ExecutionException e) {
-                LOG.error("Can't compute graph: {} in range: min = {} max: {}", getGraphFunction(), getMin(), getMax());
-                if (LOG.isDebugEnabled()) e.printStackTrace();
-            }
-        }
     }
 
     @Override
@@ -64,6 +30,11 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
         for (String c : coeffs) {
             coefficients.add(Double.valueOf(c));
         }
+    }
+
+    @Override
+    protected IGraphComputer getGraphComputer(double min, double max, double step) {
+        return new GraphComputer(coefficients, min, max, step);
     }
 
     @Override
@@ -81,7 +52,7 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
     }
 
 
-    private static class GraphComputer implements Callable<List<Coordinate>> {
+    private static class GraphComputer implements IGraphComputer {
 
         private final List<Double> coefficients;
 
@@ -144,10 +115,12 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
             return result;
         }
 
+        @Override
         public List<Coordinate> getXZeroes() {
             return xZeroPoints;
         }
 
+        @Override
         public List<Coordinate> getYZeroes() {
             return yZeroPoints;
         }
@@ -161,6 +134,7 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
          * @param x angular frequency
          * @return complex result of function
          */
+        @Override
         public Coordinate compute(double x) {
             int count = 0;
             Complex result = new Complex(0, 0);
@@ -174,7 +148,7 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
             return new Coordinate(result.getReal(), result.getImaginary());
         }
 
-        public Coordinate getZeroFromSegment(double first, double second, boolean yAxis) {
+        private Coordinate getZeroFromSegment(double first, double second, boolean yAxis) {
             if (Double.isNaN(first) || Double.isNaN(second))
                 throw new IllegalArgumentException("first or second is NaN");
             Coordinate zero;

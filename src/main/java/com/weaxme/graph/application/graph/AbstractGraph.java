@@ -3,14 +3,22 @@ package com.weaxme.graph.application.graph;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.weaxme.graph.application.IGraphApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 /**
  * @author Vitaliy Gonchar
  */
 public abstract class AbstractGraph implements IGraph {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractGraph.class);
 
     private String function;
 
@@ -48,13 +56,43 @@ public abstract class AbstractGraph implements IGraph {
             this.max = max;
             this.step = step;
             refresh();
-            initPoints(step);
+            computePoints();
             this.markStep = computeMarkStep(this.min, this.max);
             return this;
         }
     }
 
-    protected abstract void initPoints(double step);
+    private void computePoints() {
+        final int availableProcessors = Runtime.getRuntime().availableProcessors();
+        final double zone =  Math.abs(getMax() - min) / availableProcessors;
+        ExecutorService executorService = Executors.newFixedThreadPool(availableProcessors + 1);
+        List<FutureTask<List<Coordinate>>> tasks = Lists.newArrayList();
+        List<IGraphComputer> graphComputers = Lists.newArrayList();
+        for (int i = 0; i < availableProcessors; i++) {
+            double newMax = min + zone;
+            IGraphComputer computer = getGraphComputer(min, newMax, step);
+            tasks.add(new FutureTask<>(computer));
+            graphComputers.add(computer);
+            min = newMax;
+        }
+
+        for (FutureTask<List<Coordinate>> task : tasks) {
+            executorService.execute(task);
+        }
+
+        for (int i = 0; i < tasks.size(); i++) {
+            try {
+                addPoints(tasks.get(i).get());
+                addXZeroPoints(graphComputers.get(i).getXZeroes());
+                addYZeroPoints(graphComputers.get(i).getYZeroes());
+            } catch (InterruptedException | ExecutionException e) {
+                LOG.error("Can't compute graph: {} in range: min = {} max: {}", getGraphFunction(), getMin(), getMax());
+                if (LOG.isDebugEnabled()) e.printStackTrace();
+            }
+        }
+    }
+
+    protected abstract IGraphComputer getGraphComputer(double min, double max, double step);
     protected abstract void init();
 
     protected final void setMin(double min) {
