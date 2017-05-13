@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 import com.weaxme.graph.application.graph.IGraph;
 import com.weaxme.graph.service.*;
-import com.weaxme.graph.service.util.GraphUtil;
+
 
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
