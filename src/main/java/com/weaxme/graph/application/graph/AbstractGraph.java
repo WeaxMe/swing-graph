@@ -21,6 +21,9 @@ public abstract class AbstractGraph implements IGraph {
     private final List<Coordinate> xZeroPoints = Lists.newArrayList();
     private final List<Coordinate> yZeroPoints = Lists.newArrayList();
 
+    private final Object lockX = new Object();
+    private final Object lockY = new Object();
+
     private double min;
     private double max;
     private double step;
@@ -38,6 +41,9 @@ public abstract class AbstractGraph implements IGraph {
             if (!function.contains(" "))
                 throw new IllegalArgumentException("function must be like '1 3 4 -5 -34 -1'. "
                         + "It is equals '1 + 3p^1 + 4p^2 - 5p^3 - 34p^4 - p^5'");
+            if (function.equals(this.function) && this.min == min && this.max == max && this.step == step) {
+                return this;
+            }
             this.function = function;
             this.min = min;
             this.max = max;
@@ -70,9 +76,21 @@ public abstract class AbstractGraph implements IGraph {
             yZeroPoints.add(point);
     }
 
+    protected final void addYZeroPoints(List<Coordinate> points) {
+        yZeroPoints.addAll(points);
+    }
+
+    protected final void addXZeroPoints(List<Coordinate> points) {
+        xZeroPoints.addAll(points);
+    }
+
     protected final void addPoint(Coordinate point) {
         if (!points.contains(point))
             points.add(point);
+    }
+
+    protected final void addPoints(List<Coordinate> points) {
+        this.points.addAll(points);
     }
 
     protected final int pointsSize() {

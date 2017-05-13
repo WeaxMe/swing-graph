@@ -48,12 +48,13 @@ public class IGraphTest {
 
     @Test
     public void testGodograph() {
-        IGraph graph = new DefaultGodographAxisGraph("1 2", -1, 1, 0.01);
-        LOG.info("graph: {}", graph);
+        double min = 0;
+        double max = 100;
+        double step = 0.01;
+        IGraph graph = new DefaultGodographAxisGraph("6 13 9 2", min, max, step);
         List<Coordinate> coordinates = graph.getPoints();
-        for (Coordinate coordinate : coordinates) {
-            LOG.info("coordinate: {}", coordinate);
-        }
+        assertTrue("coordinates size", coordinates.size() == Math.abs(max - min) / step);
+        assertTrue("zero points", graph.getXZeroPoints().size() + graph.getYZeroPoints().size() == 3);
     }
 
     @Test
