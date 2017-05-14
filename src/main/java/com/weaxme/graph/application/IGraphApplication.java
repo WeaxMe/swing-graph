@@ -17,12 +17,18 @@ public interface IGraphApplication extends Serializable {
     public static final int MAX_X_MARKS = 10;
     public static final int MAX_Y_MARKS = 10;
 
+    public static final double MIN_STEP = 0.001;
+    public static final double MAX_STEP = 0.1;
+
+    public static final int MIN_SECONDS_DELAY = 0;
+    public static final int MAX_SECONDS_DELAY = 10;
+
     public IGraphApplication updateGraph(PixelCoordinate point1, PixelCoordinate point2);
     public IGraphApplication buildGraphAxisZeroLines();
     public IGraphApplication repaintGraph(long delay);
     public IGraphApplication repaintGraphWithoutDelay();
     public IGraphApplication setGraph(IGraph graph);
-    public IGraphApplication setGraphDelay(long delay);
+    public IGraphApplication setGraphDelay(int delay);
     public IGraphApplication setBorderPixelLimit(int limit);
     public IGraphApplication setMarkLength(int markLength);
     public IGraphApplication setGraphPanel(IGraphPanel graphPanel);
@@ -34,9 +40,11 @@ public interface IGraphApplication extends Serializable {
     public IGraphApplication setPointMultiplier(double multiplier);
     public IGraphApplication setX0(int x0);
     public IGraphApplication setY0(int y0);
+    public IGraphApplication addGraphUpdateListener(IGraphUpdateListener listener);
+    public void notifyGraphUpdateListeners();
 
     public IGraph getGraph();
-    public long getGraphDelay();
+    public int getGraphDelay();
     public int getMarkPixelStep();
     public int getXPixelStep();
     public int getYPixelStep();

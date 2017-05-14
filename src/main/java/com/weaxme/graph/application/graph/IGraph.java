@@ -1,5 +1,7 @@
 package com.weaxme.graph.application.graph;
 
+import com.weaxme.graph.application.IGraphApplication;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,8 +16,11 @@ public interface IGraph extends Serializable {
     public List<Coordinate> getPoints();
     public List<Coordinate> getXZeroPoints();
     public List<Coordinate> getYZeroPoints();
+    public List<PixelCoordinate> getPixelPoints(IGraphApplication app);
     public double getMin();
     public double getMax();
     public double getStep();
     public double getMarkStep();
+
+    public boolean equals(String function, double min, double max, double step);
 }

@@ -131,6 +131,7 @@ public class DefaultGodographAxisGraph extends AbstractGraph {
          * i * i * i * i = 1
          * i * i * i * i * i = -i
          * i * i * i * i * i * i = -1
+         *
          * @param x angular frequency
          * @return complex result of function
          */

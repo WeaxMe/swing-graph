@@ -48,9 +48,6 @@ public abstract class AbstractGraph implements IGraph {
             if (!function.contains(" "))
                 throw new IllegalArgumentException("function must be like '1 3 4 -5 -34 -1'. "
                         + "It is equals '1 + 3p^1 + 4p^2 - 5p^3 - 34p^4 - p^5'");
-            if (function.equals(this.function) && this.min == min && this.max == max && this.step == step) {
-                return this;
-            }
             this.function = function;
             this.min = min;
             this.max = max;
@@ -68,12 +65,13 @@ public abstract class AbstractGraph implements IGraph {
         ExecutorService executorService = Executors.newFixedThreadPool(availableProcessors + 1);
         List<FutureTask<List<Coordinate>>> tasks = Lists.newArrayList();
         List<IGraphComputer> graphComputers = Lists.newArrayList();
+        double counter = min;
         for (int i = 0; i < availableProcessors; i++) {
-            double newMax = min + zone;
-            IGraphComputer computer = getGraphComputer(min, newMax, step);
+            double newMax = counter + zone;
+            IGraphComputer computer = getGraphComputer(counter, newMax, step);
             tasks.add(new FutureTask<>(computer));
             graphComputers.add(computer);
-            min = newMax;
+            counter = newMax;
         }
 
         for (FutureTask<List<Coordinate>> task : tasks) {
@@ -159,6 +157,18 @@ public abstract class AbstractGraph implements IGraph {
     }
 
     @Override
+    public List<PixelCoordinate> getPixelPoints(IGraphApplication app) {
+        List<PixelCoordinate> pixelPoints = Lists.newArrayList();
+        for (Coordinate coordinate : points) {
+            PixelCoordinate pixelCoordinate = new PixelCoordinate(coordinate, app);
+            if (pixelCoordinate.isValid()) {
+                pixelPoints.add(pixelCoordinate);
+            }
+        }
+        return pixelPoints;
+    }
+
+    @Override
     public final IGraph refresh() {
         points.clear();
         xZeroPoints.clear();
@@ -199,5 +209,10 @@ public abstract class AbstractGraph implements IGraph {
         synchronized (lock) {
             return Collections.unmodifiableList(yZeroPoints);
         }
+    }
+
+    @Override
+    public boolean equals(String function, double min, double max, double step) {
+        return this.function.equals(function) && this.min == min && this.max == max && this.step == step;
     }
 }

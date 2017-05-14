@@ -14,6 +14,8 @@ import java.awt.event.ComponentEvent;
 import java.util.Iterator;
 import java.util.List;
 
+import com.weaxme.graph.component.util.GraphPaintUtil;
+
 /**
  * @author Vitaliy Gonchar
  */
@@ -152,7 +154,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
             if (point.isValid()) {
                 g2d.drawLine(point.getX(), app.getY0(), point.getX(), app.getY0() + length);
                 double x = point.getPoint().getX();
-                String format = getDoubleFormat(x);
+                String format = GraphPaintUtil.getDoubleFormat(x);
                 g2d.drawString(String.format(format, x), point.getX() + 5, app.getY0() + length + length / 2);
             }
         }
@@ -164,7 +166,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
             if (point.isValid()) {
                 g2d.drawLine(app.getX0(), point.getY(), app.getX0() + length, point.getY());
                 double y = point.getPoint().getY();
-                String format = getDoubleFormat(y);
+                String format = GraphPaintUtil.getDoubleFormat(y);
                 g2d.drawString(String.format(format, y), app.getX0() + length + length / 2, point.getY());
             }
         }
@@ -172,7 +174,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
 
     private void buildMarksOnX(Graphics2D g2d) {
         final double step = app.getMarkStep();
-        String format = getDoubleFormat(step);
+        String format = GraphPaintUtil.getDoubleFormat(step);
         double counter = step;
         g2d.drawString("0", app.getX0() + 2, app.getY0() + 2 * markLength + 2);
         for (int x = app.getX0() + app.getMarkPixelStep(); x <= app.getGraphMaxWidth(); x += app.getMarkPixelStep()) {
@@ -192,7 +194,7 @@ public class GraphPanel extends JPanel implements IGraphPanel {
 
     private void buildMarksOnY(Graphics2D g2d) {
         final double step = app.getMarkStep();
-        String format = getDoubleFormat(step);
+        String format = GraphPaintUtil.getDoubleFormat(step);
         double counter = step;
         for (int y = app.getY0() - app.getMarkPixelStep(); y >= app.getBorderPixelLimit(); y -= app.getMarkPixelStep()) {
             buildGraphAxisLine(g2d, app.getBorderPixelLimit(), y, app.getGraphMaxWidth(), y);
@@ -239,10 +241,5 @@ public class GraphPanel extends JPanel implements IGraphPanel {
         int [] yW = {app.getY0() + step, app.getY0(), app.getY0() - step};
         g2d.fillPolygon(new Polygon(xH, yH, xH.length));
         g2d.fillPolygon(new Polygon(xW, yW, xW.length));
-    }
-
-
-    private String getDoubleFormat(double number) {
-        return number < 1 ? "%.3f" : number >= 10 ? "%.0f" : "%.1f";
     }
 }

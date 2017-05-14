@@ -31,10 +31,11 @@ public class Main {
                 Dimension dimension = new Dimension(1280, 800);
                 IGraphPanel graphPanel = injector.getInstance(IGraphPanel.class);
 
-                injector.getInstance(IGraphApplication.class)
+                IGraphApplication app = injector.getInstance(IGraphApplication.class)
                         .setGraphPanel(graphPanel)
-                        .setGraph(new DefaultGodographAxisGraph("6 13 9 2",0, 100, 0.01));
-                IGraphCommandWindow travel = injector.getInstance(TravelTimeGraphCommandWindow.class);
+                        .setGraph(new DefaultGodographAxisGraph("6 13 9 2", 0, 100, 0.01));
+                TravelTimeGraphCommandWindow travel = injector.getInstance(TravelTimeGraphCommandWindow.class);
+                app.addGraphUpdateListener(travel);
                 JFrame frame = new GraphWindow(graphPanel, dimension, travel);
                 frame.setVisible(true);
             }

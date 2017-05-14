@@ -96,4 +96,13 @@ public class IGraphTest {
     private double functionXplusX(double x) {
         return x + x;
     }
+
+    @Test
+    public void testDelay() throws Exception {
+        long delay = 1;
+        int number = 10000;
+        for (int i = 0; i < number; i++) {
+            Thread.sleep(delay);
+        }
+    }
 }

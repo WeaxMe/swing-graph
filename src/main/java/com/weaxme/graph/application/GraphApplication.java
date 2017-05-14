@@ -6,6 +6,8 @@ import com.weaxme.graph.application.graph.Coordinate;
 import com.weaxme.graph.application.graph.IGraph;
 import com.weaxme.graph.application.graph.PixelCoordinate;
 import com.weaxme.graph.component.panel.IGraphPanel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.util.List;
@@ -18,26 +20,29 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class GraphApplication implements IGraphApplication {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GraphApplication.class);
+
     private IGraph graph;
     private IGraphPanel graphPanel;
 
-    private long delay           = 1;
-    private int markPixelStep    = 10;
-    private double markStep      = 0;
-    private int borderPixelLimit = 20;
-    private int markLength       = 10;
+    private int delayToBuildGraph = 1;
+    private int markPixelStep     = 10;
+    private double markStep       = 0;
+    private int borderPixelLimit  = 20;
+    private int markLength        = 10;
     private int x0;
     private int y0;
 
     private int maxScheduleHeight;
     private int maxScheduleWidth;
 
-
     private int graphLineWidth     = 2;
     private double pointMultiplier = 1;
 
     private boolean nowRepaint = false;
     private boolean build      = false;
+
+    private final List<IGraphUpdateListener> graphUpdateListeners = Lists.newArrayList();
 
     @Override
     public IGraphApplication updateGraph(PixelCoordinate point1, PixelCoordinate point2) {
@@ -94,9 +99,9 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
-    public IGraphApplication setGraphDelay(long delay) {
-        if (delay < 0) throw new IllegalArgumentException("delay cannot be < 0");
-        this.delay = delay;
+    public IGraphApplication setGraphDelay(int delay) {
+        if (delay < 0) throw new IllegalArgumentException("delayToBuildGraph cannot be < 0");
+        this.delayToBuildGraph = delay;
         return this;
     }
 
@@ -147,8 +152,16 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
-    public long getGraphDelay() {
-        return delay;
+    public IGraphApplication addGraphUpdateListener(IGraphUpdateListener listener) {
+        if (listener == null)
+            throw new IllegalArgumentException("listener can't be null");
+        graphUpdateListeners.add(listener);
+        return this;
+    }
+
+    @Override
+    public int getGraphDelay() {
+        return delayToBuildGraph;
     }
 
     @Override
@@ -256,5 +269,12 @@ public class GraphApplication implements IGraphApplication {
             throw new IllegalArgumentException("Point multiplier cannot be <= 0");
         this.pointMultiplier = multiplier;
         return this;
+    }
+
+    @Override
+    public void notifyGraphUpdateListeners() {
+        for (IGraphUpdateListener listener : graphUpdateListeners) {
+            listener.graphUpdate(this);
+        }
     }
 }
