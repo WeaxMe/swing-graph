@@ -14,24 +14,29 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.*;
 
-
 /**
  * @author Vitaliy Gonchar
  */
-public class GraphUpdater implements Runnable {
+class GraphUpdater implements IGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphUpdater.class);
 
     private final IGraphApplication app;
-    private final long delayToBuildGraphMs;
+    private long delayToBuildGraphMs;
+
+    private boolean stop;
+    private boolean pause;
+    private boolean updated;
+
+    private final Object lock = new Object();
 
     public GraphUpdater(IGraphApplication app) {
         this(app, app.getGraphDelay());
     }
 
-    public GraphUpdater(IGraphApplication app, int delayToBuildGraph) {
+    public GraphUpdater(IGraphApplication app, long delayToBuildGraph) {
         this.app = app;
-        this.delayToBuildGraphMs = delayToBuildGraph * 1000;
+        this.delayToBuildGraphMs = delayToBuildGraph;
     }
 
     @Override
@@ -52,41 +57,36 @@ public class GraphUpdater implements Runnable {
         boolean firstPoint = true;
         PixelCoordinate point1 = null;
         Iterator<PixelCoordinate> iterator = points.iterator();
-        long startTime = System.currentTimeMillis();
-        long counter = 0;
         ExecutorService executor = Executors.newFixedThreadPool(10);
         long timerDelay = delay != 0 && microseconds ? delay : 0;
         FutureTask<Void> task = null;
-        LOG.debug("====================================================================");
-        while (iterator.hasNext()) {
-            PixelCoordinate point2 = iterator.next();
-            if (firstPoint) {
-                point1 = point2;
-                firstPoint = false;
-            }
-            app.updateGraph(point1, point2);
-            if (delay != 0) {
-                if (task == null || task.isDone()) {
-                    if (timerDelay != 0 && (task == null || task.isDone())) {
-                        task = new FutureTask<>(new SleepCounter(timerDelay));
-                        executor.execute(task);
-                    } else {
-                        delay(delay, microseconds);
+        while (!stop && iterator.hasNext()) {
+            if (!pause) {
+                PixelCoordinate point2 = iterator.next();
+                if (firstPoint) {
+                    point1 = point2;
+                    firstPoint = false;
+                }
+                app.updateGraph(point1, point2);
+                if (delay != 0) {
+                    if (task == null || task.isDone()) {
+                        if (timerDelay != 0 && (task == null || task.isDone())) {
+                            task = new FutureTask<>(new SleepCounter(timerDelay));
+                            executor.execute(task);
+                        } else {
+                            delay(delay, microseconds);
+                        }
                     }
                 }
-            }
-
-            counter++;
-
-            point1 = point2;
+                point1 = point2;
+            } else delay(300, false);
         }
-        LOG.debug("====================================================================");
-        LOG.debug("delay counter: {}", counter);
-        long time = System.currentTimeMillis() - startTime;
-        LOG.debug("Time for build graph: {} ms,  {} s", time, TimeUnit.MILLISECONDS.toSeconds(time));
-        app.buildGraphAxisZeroLines();
-        app.setNowRepaint(false);
+        if (!stop) {
+            app.buildGraphAxisZeroLines();
+        }
         app.notifyGraphUpdateListeners();
+        app.setNowRepaint(false);
+        updated = true;
     }
 
     private class SleepCounter implements Callable<Void> {
@@ -107,6 +107,35 @@ public class GraphUpdater implements Runnable {
             }
             return null;
         }
+    }
+
+    @Override
+    public IGraphUpdater setDelayForBuild(long delay) {
+        if (delay < 0)
+            throw new IllegalArgumentException("delay can't be < 0");
+        this.delayToBuildGraphMs = delay;
+        return this;
+    }
+
+    @Override
+    public IGraphUpdater setStop(boolean stop) {
+        synchronized (lock) {
+            this.stop = stop;
+            return this;
+        }
+    }
+
+    @Override
+    public IGraphUpdater setPause(boolean pause) {
+        synchronized (lock) {
+            this.pause = pause;
+            return this;
+        }
+    }
+
+    @Override
+    public boolean isUpdated() {
+        return updated;
     }
 
     private void delay(long delay, boolean microseconds) {

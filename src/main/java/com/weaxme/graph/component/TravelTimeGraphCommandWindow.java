@@ -3,6 +3,7 @@ package com.weaxme.graph.component;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.weaxme.graph.application.IGraphUpdateListener;
+import com.weaxme.graph.application.IGraphUpdater;
 import com.weaxme.graph.application.graph.IGraph;
 import com.weaxme.graph.application.IGraphApplication;
 import com.weaxme.graph.application.graph.DefaultGodographAxisGraph;
@@ -68,12 +69,16 @@ public class TravelTimeGraphCommandWindow extends JFrame
                     if (!currentGraph.equals(function, min, max, step)) {
                         app.setGraph(new DefaultGodographAxisGraph(function, min, max, step));
                     }
-                    app.setGraphDelay((Integer) timeComboBox.getSelectedItem());
-                    app.repaintGraph(0);
+                    app.setGraphDelay((Integer) timeComboBox.getSelectedItem() * 1000);
+                    app.repaintGraph();
                     startButton.setText(PAUSE);
                 } else if (startButton.getText().equals(PAUSE)) {
+                    IGraphUpdater graphUpdater = app.getGraphUpdater();
+                    graphUpdater.setPause(true);
                     startButton.setText(RESUME);
                 } else if (startButton.getText().equals(RESUME)) {
+                    IGraphUpdater graphUpdater = app.getGraphUpdater();
+                    graphUpdater.setPause(false);
                     startButton.setText(PAUSE);
                 }
                 pack();
@@ -84,6 +89,8 @@ public class TravelTimeGraphCommandWindow extends JFrame
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 if (!startButton.getText().equals(START)) {
+                    app.getGraphUpdater().setStop(true);
+                    app.getGraphPanel().clearAndRepaint();
                     startButton.setText(START);
                 }
             }
@@ -113,9 +120,10 @@ public class TravelTimeGraphCommandWindow extends JFrame
             public void actionPerformed(ActionEvent actionEvent) {
                 Integer width = (Integer) lineWidthBox.getSelectedItem();
                 app.setGraphLineWidth(width);
-                app.repaintGraphWithoutDelay();
+                app.repaintGraph(0);
             }
         });
+        lineWidthBox.setSelectedItem(app.getGraphLineWidth());
     }
 
     @SuppressWarnings("unchecked")
@@ -134,7 +142,7 @@ public class TravelTimeGraphCommandWindow extends JFrame
         for (int i = app.MIN_SECONDS_DELAY; i <= app.MAX_SECONDS_DELAY; i++) {
             timeComboBox.addItem(i);
         }
-        timeComboBox.setSelectedItem(app.getGraphDelay());
+        timeComboBox.setSelectedItem(app.getGraphDelay() / 1000);
     }
 
     private void createUIComponents() {

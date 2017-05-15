@@ -25,7 +25,7 @@ public class GraphApplication implements IGraphApplication {
     private IGraph graph;
     private IGraphPanel graphPanel;
 
-    private int delayToBuildGraph = 1;
+    private long delayToBuildGraph = 1000;
     private int markPixelStep     = 10;
     private double markStep       = 0;
     private int borderPixelLimit  = 20;
@@ -41,6 +41,8 @@ public class GraphApplication implements IGraphApplication {
 
     private boolean nowRepaint = false;
     private boolean build      = false;
+
+    private IGraphUpdater graphUpdater;
 
     private final List<IGraphUpdateListener> graphUpdateListeners = Lists.newArrayList();
 
@@ -63,22 +65,17 @@ public class GraphApplication implements IGraphApplication {
         return this;
     }
 
+    @Override
+    public IGraphApplication repaintGraph() {
+        return repaintGraph(delayToBuildGraph);
+    }
 
     @Override
     public IGraphApplication repaintGraph(long delay) {
         if (!nowRepaint) {
             graphPanel.clearAndRepaint();
             ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2);
-            executor.schedule(new GraphUpdater(this), delay, TimeUnit.MILLISECONDS);
-        }
-        return this;
-    }
-
-    @Override
-    public IGraphApplication repaintGraphWithoutDelay() {
-        if (!nowRepaint) {
-            graphPanel.clearAndRepaint();
-            new Thread(new GraphUpdater(this, 0)).start();
+            executor.schedule(getGraphUpdater().setDelayForBuild(delay), 0, TimeUnit.MILLISECONDS);
         }
         return this;
     }
@@ -99,7 +96,7 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
-    public IGraphApplication setGraphDelay(int delay) {
+    public IGraphApplication setGraphDelay(long delay) {
         if (delay < 0) throw new IllegalArgumentException("delayToBuildGraph cannot be < 0");
         this.delayToBuildGraph = delay;
         return this;
@@ -160,7 +157,7 @@ public class GraphApplication implements IGraphApplication {
     }
 
     @Override
-    public int getGraphDelay() {
+    public long getGraphDelay() {
         return delayToBuildGraph;
     }
 
@@ -261,6 +258,13 @@ public class GraphApplication implements IGraphApplication {
     @Override
     public double getPointMultiplier() {
         return pointMultiplier;
+    }
+
+    @Override
+    public IGraphUpdater getGraphUpdater() {
+        if (graphUpdater != null && graphUpdater.isUpdated() || graphUpdater == null)
+            graphUpdater = new GraphUpdater(this);
+        return graphUpdater;
     }
 
     @Override

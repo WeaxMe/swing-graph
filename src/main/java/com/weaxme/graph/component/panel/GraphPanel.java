@@ -3,7 +3,6 @@ package com.weaxme.graph.component.panel;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.weaxme.graph.application.GraphUpdater;
 import com.weaxme.graph.application.IGraphApplication;
 import com.weaxme.graph.application.graph.PixelCoordinate;
 
@@ -46,7 +45,8 @@ public class GraphPanel extends JPanel implements IGraphPanel {
             @Override
             public void componentResized(ComponentEvent componentEvent) {
                 clearAndRepaint();
-                new Thread(new GraphUpdater(app, 0)).start();
+                app.getGraphUpdater().setDelayForBuild(0);
+                app.repaintGraph(0);
             }
         });
     }

@@ -25,10 +25,10 @@ public interface IGraphApplication extends Serializable {
 
     public IGraphApplication updateGraph(PixelCoordinate point1, PixelCoordinate point2);
     public IGraphApplication buildGraphAxisZeroLines();
+    public IGraphApplication repaintGraph();
     public IGraphApplication repaintGraph(long delay);
-    public IGraphApplication repaintGraphWithoutDelay();
     public IGraphApplication setGraph(IGraph graph);
-    public IGraphApplication setGraphDelay(int delay);
+    public IGraphApplication setGraphDelay(long delay);
     public IGraphApplication setBorderPixelLimit(int limit);
     public IGraphApplication setMarkLength(int markLength);
     public IGraphApplication setGraphPanel(IGraphPanel graphPanel);
@@ -44,7 +44,7 @@ public interface IGraphApplication extends Serializable {
     public void notifyGraphUpdateListeners();
 
     public IGraph getGraph();
-    public int getGraphDelay();
+    public long getGraphDelay();
     public int getMarkPixelStep();
     public int getXPixelStep();
     public int getYPixelStep();
@@ -60,5 +60,7 @@ public interface IGraphApplication extends Serializable {
     public int getGraphLineWidth();
     public List<Integer> getPossibleWidth();
     public double getPointMultiplier();
+
+    public IGraphUpdater getGraphUpdater();
 
 }
