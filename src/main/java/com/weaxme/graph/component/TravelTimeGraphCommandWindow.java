@@ -1,5 +1,6 @@
 package com.weaxme.graph.component;
 
+import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.weaxme.graph.application.IGraphUpdateListener;
@@ -8,12 +9,14 @@ import com.weaxme.graph.application.graph.IGraph;
 import com.weaxme.graph.application.IGraphApplication;
 import com.weaxme.graph.application.graph.DefaultGodographAxisGraph;
 import com.weaxme.graph.component.util.GraphPaintUtil;
+import com.weaxme.graph.service.TimeTravelGraphReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.file.Path;
 
 /**
  * @author Vitaliy Gonchar
@@ -34,12 +37,14 @@ public class TravelTimeGraphCommandWindow extends JFrame
     private JButton stopButton;
     private JComboBox stepComboBox;
     private JComboBox timeComboBox;
+    private JButton chooseFileBut;
 
     private static final String START  = "Start";
     private static final String PAUSE  = "Pause";
     private static final String RESUME = "Resume";
     private static final String STOP   = "Stop";
 
+    private static final String OPEN_FILE = "Open file";
 
     @Inject
     public TravelTimeGraphCommandWindow(final IGraphApplication app) {
@@ -66,7 +71,7 @@ public class TravelTimeGraphCommandWindow extends JFrame
                             .replace(",", "."));
                     if (step <= 0) step = app.getGraph().getStep();
                     IGraph currentGraph = app.getGraph();
-                    if (!currentGraph.equals(function, min, max, step)) {
+                    if (!currentGraph.equals(function, min, max, step) && isFunctionValid(function)) {
                         app.setGraph(new DefaultGodographAxisGraph(function, min, max, step));
                     }
                     app.setGraphDelay((Integer) timeComboBox.getSelectedItem() * 1000);
@@ -95,8 +100,21 @@ public class TravelTimeGraphCommandWindow extends JFrame
                 }
             }
         });
+        chooseFileBut.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                JFileChooser fileChooser = new JFileChooser();
+                int ret = fileChooser.showDialog(null, OPEN_FILE);
+                if (ret == JFileChooser.APPROVE_OPTION) {
+                    Path path = fileChooser.getSelectedFile().toPath();
+                    String function = TimeTravelGraphReader.readFunctionFromFile(path);
+                    if (isFunctionValid(function)) {
+                        graphFunctionField.setValue(function);
+                    }
+                }
+            }
+        });
     }
-
 
     private void configure(final IGraphApplication app) {
         IGraph graph = app.getGraph();
@@ -172,5 +190,13 @@ public class TravelTimeGraphCommandWindow extends JFrame
         if (!startButton.equals(START)) {
             startButton.setText(START);
         }
+    }
+
+    private boolean isFunctionValid(String function) {
+        if (Strings.isNullOrEmpty(function))
+            return false;
+        if (!function.contains(" "))
+            return false;
+        return !function.endsWith(" ");
     }
 }
